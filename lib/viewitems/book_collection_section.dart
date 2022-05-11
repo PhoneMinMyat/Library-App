@@ -1,24 +1,37 @@
 import 'package:flutter/material.dart';
+import 'package:library_app/data/vos/book_list_vo.dart';
+import 'package:library_app/data/vos/book_vo.dart';
 import 'package:library_app/resources/dimens.dart';
+import 'package:library_app/resources/string.dart';
 import 'package:library_app/viewitems/book_view_item.dart';
 
 class BookCollectionSection extends StatelessWidget {
-  final Function onTapBookItem;
+  final Function(String) onTapBookItem;
   final Function(String) onTapMore;
-  final String titleName;
+  final String listTitleName;
+  final BookListVO bookCollection;
   const BookCollectionSection(
-    this.onTapBookItem, {required this.titleName,required this.onTapMore,
+    this.onTapBookItem, {
+    required this.listTitleName,
+    required this.bookCollection,
+    required this.onTapMore,
     Key? key,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return Column(
+    return (bookCollection.booksList?.isEmpty ?? true)? Container() :Column(
       // mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-         Padding(
-          padding:const EdgeInsets.symmetric(horizontal: MARGIN_MEDIUM_2x),
-          child: TitleSectionView(titleName: titleName,onTapMore: (title){onTapMore(title);},),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: MARGIN_MEDIUM_2x),
+          child: TitleSectionView(
+            titleName: listTitleName,
+            onTapMore: (title) {
+              onTapMore((title == SIMILAR_EBOOKS)? bookCollection.listName ?? '' : title);
+            },
+          ),
         ),
         const SizedBox(
           height: MARGIN_MEDIUM,
@@ -27,13 +40,14 @@ class BookCollectionSection extends StatelessWidget {
           height: HORIZONTAL_BOOK_LIST_VIEW_HEIGHT,
           child: ListView.builder(
               padding: const EdgeInsets.only(left: MARGIN_MEDIUM_2x),
-              itemCount: 5,
+              itemCount: bookCollection.booksList?.length ?? 0,
               shrinkWrap: true,
               scrollDirection: Axis.horizontal,
               itemBuilder: (context, index) {
-                return BookViewItem(() {
-                  onTapBookItem();
-                });
+                return BookViewItem((bookId) {
+                  onTapBookItem(bookId);
+                },
+                book: bookCollection.booksList?[index] ?? BookVO(),);
               }),
         )
       ],
@@ -44,7 +58,9 @@ class BookCollectionSection extends StatelessWidget {
 class TitleSectionView extends StatelessWidget {
   final String titleName;
   final Function(String) onTapMore;
-  const TitleSectionView({required this.titleName,required this.onTapMore,
+  const TitleSectionView({
+    required this.titleName,
+    required this.onTapMore,
     Key? key,
   }) : super(key: key);
 
@@ -52,10 +68,10 @@ class TitleSectionView extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-         Text(
+        Text(
           titleName,
-          style:
-             const TextStyle(fontSize: TEXT_REGULAR_2x, fontWeight: FontWeight.w600),
+          style: const TextStyle(
+              fontSize: TEXT_REGULAR_2x, fontWeight: FontWeight.w600),
         ),
         const Spacer(),
         GestureDetector(

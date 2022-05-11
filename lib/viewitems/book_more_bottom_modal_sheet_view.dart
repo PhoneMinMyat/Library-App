@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:library_app/data/vos/book_vo.dart';
 import 'package:library_app/resources/dimens.dart';
 import 'package:library_app/resources/string.dart';
 import 'package:library_app/viewitems/image_and_title_section_view.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 
 class BookMoreModalBottomSheetView extends StatelessWidget {
-  const BookMoreModalBottomSheetView({
+  final BookVO book;
+  const BookMoreModalBottomSheetView({required this.book,
     Key? key,
   }) : super(key: key);
 
@@ -19,10 +21,10 @@ class BookMoreModalBottomSheetView extends StatelessWidget {
             padding: const EdgeInsets.symmetric(
                 horizontal: MARGIN_MEDIUM_3x, vertical: MARGIN_MEDIUM),
             height: BOOK_BOTTOM_MODAL_TITLE_HEIGHT,
-            child: const ImageAndTitleSectionView(
-                  title: 'Never Send a Human to Do a Machine\'s Job',
-                  author: 'Yong Zhao, Gaoming Zhang,Jin Xijinga',
-                  type: 'Ebook . Sample',
+            child:  ImageAndTitleSectionView(
+                imageUrl: book.bookImage ?? '',
+                  title: book.title ?? '',
+                  author: book.author ?? '',
                 ),
           ),
           Container(

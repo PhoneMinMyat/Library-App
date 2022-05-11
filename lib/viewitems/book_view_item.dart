@@ -1,17 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:library_app/data/vos/book_vo.dart';
 import 'package:library_app/resources/dimens.dart';
 import 'package:library_app/widgets/book_status_icon.dart';
 
 class BookViewItem extends StatelessWidget {
-  final Function onTapBook;
+  final Function(String) onTapBook;
   final bool isHome;
   final bool isSample;
   final bool isDownloaded;
+  final BookVO book;
   const BookViewItem(
     this.onTapBook, {
     this.isHome = true,
     this.isSample = false,
     this.isDownloaded = false,
+    required this.book,
     Key? key,
   }) : super(key: key);
 
@@ -19,7 +22,7 @@ class BookViewItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        onTapBook();
+        onTapBook(book.primaryIsbn10 ?? '');
       },
       child: Container(
         width:  BOOK_ITEM_WIDTH,
@@ -32,8 +35,13 @@ class BookViewItem extends StatelessWidget {
               child: Stack(
                 children: [
                   Positioned.fill(
-                    child: Image.network(
-                      'https://www.skipprichard.com/wp-content/uploads/2016/01/9780062367556.jpg',
+                    child: (book.bookImage == null)?
+                      Padding(
+                        padding: const EdgeInsets.all(MARGIN_MEDIUM_2x),
+                        child: Image.asset('assets/images/book.png'),
+                      )
+                     :Image.network(
+                      book.bookImage ?? '',
                       fit: BoxFit.cover,
                     ),
                   ),
@@ -84,12 +92,12 @@ class BookViewItem extends StatelessWidget {
             const SizedBox(
               height: MARGIN_SMALL,
             ),
-            const Text(
-              'Church of Marvels',
+             Text(
+              book.title ?? '',
               textAlign: TextAlign.start,
-              maxLines: 2,
+              maxLines: 1,
               overflow: TextOverflow.ellipsis,
-              style: TextStyle(
+              style: const TextStyle(
                 color: Colors.grey,
                 fontSize: TEXT_SMALL_2x,
               ),

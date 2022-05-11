@@ -6,12 +6,14 @@ class ImageAndTitleSectionView extends StatelessWidget {
   final String title;
   final String author;
   final String type;
+  final String imageUrl;
 
   const ImageAndTitleSectionView(
       {this.isListItem = true,
       required this.title,
       required this.author,
-      required this.type,
+      this.type = '',
+      required this.imageUrl,
       Key? key})
       : super(key: key);
 
@@ -21,8 +23,12 @@ class ImageAndTitleSectionView extends StatelessWidget {
       children: [
         ClipRRect(
           borderRadius: BorderRadius.circular(MARGIN_MEDIUM),
-          child: Image.network(
-              'https://www.skipprichard.com/wp-content/uploads/2016/01/9780062367556.jpg'),
+          child: (imageUrl.isEmpty)
+              ? Padding(
+                  padding: const EdgeInsets.all(MARGIN_MEDIUM_2x),
+                  child: Image.asset('assets/images/book.png'),
+                )
+              : Image.network(imageUrl, fit: BoxFit.cover, width:(isListItem)? MARGIN_XXLARGE : null,),
         ),
         const SizedBox(
           width: MARGIN_MEDIUM,
@@ -33,7 +39,7 @@ class ImageAndTitleSectionView extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                 title,
+                  title,
                   maxLines: (isListItem) ? 2 : null,
                   overflow: (isListItem) ? TextOverflow.ellipsis : null,
                   style: (isListItem)
@@ -44,13 +50,13 @@ class ImageAndTitleSectionView extends StatelessWidget {
                 const SizedBox(
                   height: MARGIN_SMALL,
                 ),
-                 Text(
-                 author,
+                Text(
+                  author,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(color: Colors.grey, fontSize: TEXT_SMALL_2x),
                 ),
-                 Text(
+                Text(
                   type,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,

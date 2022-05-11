@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:library_app/data/vos/shelve_vo.dart';
+import 'package:library_app/data/vos/shelf_vo.dart';
 import 'package:library_app/resources/dimens.dart';
 
 class BookShelvesCollectionListItem extends StatelessWidget {
   final Function onTapShelvesList;
-  final ShelveVO shelve;
+  final ShelfVO shelve;
   const BookShelvesCollectionListItem(this.onTapShelvesList,
       {required this.shelve, Key? key})
       : super(key: key);
@@ -49,7 +49,7 @@ class BookShelvesCollectionListItem extends StatelessWidget {
                 children:  [
                   Text(
                     shelve.name ?? '',
-                    style: TextStyle(fontWeight: FontWeight.bold),
+                    style: const TextStyle(fontWeight: FontWeight.bold),
                   ),
                 const  SizedBox(
                     height: MARGIN_SMALL,

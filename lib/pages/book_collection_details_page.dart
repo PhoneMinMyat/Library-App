@@ -1,36 +1,81 @@
 import 'package:flutter/material.dart';
-import 'package:library_app/dummy_datas.dart';
+import 'package:library_app/bloc/collection_details_bloc.dart';
+import 'package:library_app/data/vos/book_vo.dart';
 import 'package:library_app/pages/book_details_page.dart';
 import 'package:library_app/resources/dimens.dart';
 import 'package:library_app/viewitems/book_view_item.dart';
+import 'package:library_app/viewitems/empty_book_view.dart';
+import 'package:provider/provider.dart';
 
-class BookCollectionDetailsPage extends StatelessWidget {
+class BookCollectionDetailsPage extends StatefulWidget {
   final String titleName;
   const BookCollectionDetailsPage({
     Key? key,
     required this.titleName,
   }) : super(key: key);
 
-  void onTapBookItem(BuildContext context) {
-    Navigator.of(context)
-        .push(MaterialPageRoute(builder: (context) => const BookDetailsPage()));
+  @override
+  State<BookCollectionDetailsPage> createState() =>
+      _BookCollectionDetailsPageState();
+}
+
+class _BookCollectionDetailsPageState extends State<BookCollectionDetailsPage> {
+  CollectionDetailsBloc? _bloc;
+  final ScrollController _scrollController = ScrollController();
+
+  @override
+  void initState() {
+    _bloc = CollectionDetailsBloc(widget.titleName);
+    _scrollController.addListener(() {
+      if (_scrollController.position.atEdge) {
+        if (_scrollController.position.pixels == 0) {
+          print('Start reached');
+        } else {
+          print('End reached');
+          _bloc?.onBookListReachedEnd();
+        }
+      }
+    });
+    super.initState();
+  }
+
+  void onTapBookItem(BuildContext context, String bookId) {
+    Navigator.of(context).push(MaterialPageRoute(
+        builder: (context) => BookDetailsPage(
+              bookId: bookId,
+            )));
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: CustomAppBarForCollectionDetails(titleName: titleName),
-      body: GridView.builder(
-        padding: const EdgeInsets.all( MARGIN_MEDIUM_2x),
-          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(mainAxisSpacing: MARGIN_MEDIUM_2x, crossAxisSpacing: MARGIN_MEDIUM,
-              crossAxisCount: 2, childAspectRatio: 1.5 / 2),
-          shrinkWrap: true,
-          itemCount: dummyBookList.length,
-          itemBuilder: (context, index) {
-            return BookViewItem(() {
-              onTapBookItem(context);
-            });
-          }),
+    return ChangeNotifierProvider(
+      create: (context) => _bloc,
+      builder: (context, child) => Scaffold(
+        appBar: CustomAppBarForCollectionDetails(titleName: widget.titleName),
+        body: Selector<CollectionDetailsBloc, List<BookVO>?>(
+          selector: (context, bloc) => bloc.bookList,
+          builder: (context, bookList, child) => (bookList == null)
+              ? const Center(child: CircularProgressIndicator())
+              : (bookList.isNotEmpty)? GridView.builder(
+                  controller: _scrollController,
+                  padding: const EdgeInsets.all(MARGIN_MEDIUM_2x),
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                      mainAxisSpacing: MARGIN_MEDIUM_2x,
+                      crossAxisSpacing: MARGIN_MEDIUM,
+                      crossAxisCount: 2,
+                      childAspectRatio: 1.5 / 2),
+                  shrinkWrap: true,
+                  itemCount: bookList.length ,
+                  itemBuilder: (context, index) {
+                    return BookViewItem(
+                      (bookId) {
+                        onTapBookItem(context, bookId);
+                      },
+                      book: bookList[index] ,
+                    );
+                  }): const EmptyBookView(isSearchView: true,),
+        ),
+      ),
     );
   }
 }

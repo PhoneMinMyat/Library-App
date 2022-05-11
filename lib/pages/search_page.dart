@@ -1,14 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:library_app/bloc/search_page_bloc.dart';
+import 'package:library_app/data/vos/book_list_vo.dart';
+import 'package:library_app/debouncer.dart';
 import 'package:library_app/viewitems/image_and_title_section_view.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 
 import 'package:library_app/data/vos/book_vo.dart';
-import 'package:library_app/dummy_datas.dart';
 import 'package:library_app/pages/book_collection_details_page.dart';
 import 'package:library_app/pages/book_details_page.dart';
 import 'package:library_app/resources/dimens.dart';
 import 'package:library_app/resources/string.dart';
 import 'package:library_app/viewitems/book_collection_listview_section.dart';
+import 'package:provider/provider.dart';
 
 class SearchPage extends StatefulWidget {
   const SearchPage({Key? key}) : super(key: key);
@@ -18,64 +21,22 @@ class SearchPage extends StatefulWidget {
 }
 
 class _SearchPageState extends State<SearchPage> {
-  bool? _isSearching;
-  bool? _isFocus;
-  bool? _isSearched;
 
-  List<BookVO>? resultSearchBook;
-  List<String> collectionTitlesList = eBooksCollectionTitle;
-  List<BookVO> databaseBookList = dummyBookList;
-  String searchWordText = '';
+  final _debouncer = Debouncer(milliseconds: 500);
+
+  SearchPageBloc? _bloc;
 
   @override
   void initState() {
-    _isFocus = true;
-    _isSearching = false;
-    _isSearched = false;
+    _bloc = SearchPageBloc();
     super.initState();
   }
 
-  void onTapSearchBar() {
-    setState(() {
-      _isFocus = true;
-      _isSearched = true;
-      _isSearching = false;
-    });
-  }
-
-  void runFilter(String searchWord) {
-    
-    List<BookVO> results = databaseBookList
-        .where(
-          (book) =>
-              book.title?.toLowerCase().contains(
-                    searchWord.toLowerCase(),
-                  ) ??
-              false,
-        )
-        .toList();
-
-    setState(() {
-      resultSearchBook?.clear();
-      _isSearching = true;
-      resultSearchBook = results;
-      searchWordText = searchWord;
-    });
-  }
-
-  void onTapSearchFirstListItme() {
-    setState(() {
-      _isFocus = false;
-      _isSearched = true;
-      _isSearching = false;
-    });
-    print('focus ==> $_isFocus');
-    print('search ==> $_isSearched');
-  }
-
-  void onTapBookItem() {
-    Navigator.of(context)
-        .push(MaterialPageRoute(builder: (context) => const BookDetailsPage()));
+  void onTapBookItem(String bookId) {
+    Navigator.of(context).push(MaterialPageRoute(
+        builder: (context) => BookDetailsPage(
+              bookId: bookId,
+            )));
   }
 
   void onTapBookListMore(String title) {
@@ -83,22 +44,28 @@ class _SearchPageState extends State<SearchPage> {
         builder: (context) => BookCollectionDetailsPage(titleName: title)));
   }
 
-  Widget _getWidgetOption() {
-    if (_isFocus == true && _isSearching == false) {
+  Widget _getWidgetOption(
+      {required bool isFocus,
+      required bool isSearching,
+      required bool isSearched,
+      required List<BookVO> resultSearchBook,
+      required List<BookListVO> resultByCategoryList,
+      required String searchWordText}) {
+    if (isFocus == true && isSearching == false) {
       return FirstSearchList(
         onTapSearchItem: () {
-          onTapSearchFirstListItme();
+          _bloc?.onSubmmit();
         },
       );
     }
 
-    if (_isFocus == false && _isSearched == true) {
+    if (isFocus == false && isSearched == true) {
       return Padding(
         padding: const EdgeInsets.symmetric(vertical: MARGIN_MEDIUM_2x),
         child: BookCollectionListViewSection(
-            collectionTitles: collectionTitlesList,
-            onTapBook: () {
-              onTapBookItem();
+            bookCollectionList: resultByCategoryList,
+            onTapBook: (tapBook) {
+              onTapBookItem(tapBook);
             },
             onTapMore: (title) {
               onTapBookListMore(title);
@@ -106,15 +73,15 @@ class _SearchPageState extends State<SearchPage> {
       );
     }
 
-    if (_isSearching == true) {
+    if (isSearching == true) {
       return SearchingResultView(
-        resultBookList: resultSearchBook ?? [],
+        resultBookList: resultSearchBook,
         searchWord: searchWordText,
-        onTapBook: () {
-          onTapBookItem();
+        onTapBook: (bookId) {
+          onTapBookItem(bookId);
         },
         onTapSearchWord: () {
-          onTapSearchFirstListItme();
+          _bloc?.onSubmmit();
         },
       );
     }
@@ -124,17 +91,46 @@ class _SearchPageState extends State<SearchPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: CustomAppBarForSearchPage(
-        onTapSearchBar: () {
-          onTapSearchBar();
-        },
-        isFocus: _isFocus ?? false,
-        onChangeTextInput: (changeValue) {
-          runFilter(changeValue);
-        },
+    return ChangeNotifierProvider(
+      create: (context) => _bloc,
+      builder: (context, child) => Consumer<SearchPageBloc>(
+        builder: (context, searchBloc, child) => Scaffold(
+          appBar: CustomAppBarForSearchPage(
+            onTapSearchBar: () {
+              SearchPageBloc bloc =
+                  Provider.of<SearchPageBloc>(context, listen: false);
+              bloc.onTapSearchBar();
+            },
+            onSubmmit: (value) {
+              SearchPageBloc bloc =
+                  Provider.of<SearchPageBloc>(context, listen: false);
+
+              _debouncer.run(() {
+                bloc.onSubmmit();
+              });
+            },
+            isFocus: searchBloc.isFocus ?? false,
+            onChangeTextInput: (changeValue) {
+              SearchPageBloc bloc =
+                  Provider.of<SearchPageBloc>(context, listen: false);
+
+              _debouncer.run(() {
+                bloc.runFilter(changeValue);
+              });
+            },
+          ),
+          body: SingleChildScrollView(
+            child: _getWidgetOption(
+                isFocus: searchBloc.isFocus ?? false,
+                isSearched: searchBloc.isSearched ?? false,
+                isSearching: searchBloc.isSearching ?? false,
+                resultSearchBook: searchBloc.resultSearchBook ?? [],
+                searchWordText: searchBloc.searchWordText,
+                resultByCategoryList:
+                    searchBloc.resultSearchBookByCategory ?? []),
+          ),
+        ),
       ),
-      body: _getWidgetOption(),
     );
   }
 }
@@ -142,7 +138,7 @@ class _SearchPageState extends State<SearchPage> {
 class SearchingResultView extends StatelessWidget {
   final List<BookVO> resultBookList;
   final String searchWord;
-  final Function onTapBook;
+  final Function(String) onTapBook;
   final Function onTapSearchWord;
   const SearchingResultView({
     Key? key,
@@ -155,9 +151,9 @@ class SearchingResultView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-
       width: double.infinity,
-      padding: const EdgeInsets.symmetric(horizontal: MARGIN_MEDIUM_2x, vertical: MARGIN_MEDIUM_3x),
+      padding: const EdgeInsets.symmetric(
+          horizontal: MARGIN_MEDIUM_2x, vertical: MARGIN_MEDIUM_3x),
       child: ListView.separated(
         shrinkWrap: true,
         itemCount: resultBookList.length + 1,
@@ -176,9 +172,10 @@ class SearchingResultView extends StatelessWidget {
             height: BOOK_BOTTOM_MODAL_LISTTILE_HEIGHT,
             child: GestureDetector(
               onTap: () {
-                onTapBook();
+                onTapBook(resultBookList[index].primaryIsbn10 ?? '');
               },
               child: ImageAndTitleSectionView(
+                imageUrl: resultBookList[index].bookImage ?? '',
                 title: resultBookList[index].title ?? '',
                 author: resultBookList[index].author ?? '',
                 type: 'Ebook . Sample',
@@ -269,8 +266,10 @@ class CustomAppBarForSearchPage extends StatelessWidget
     implements PreferredSizeWidget {
   final bool isFocus;
   final Function(String) onChangeTextInput;
+  final Function(String) onSubmmit;
   final Function onTapSearchBar;
   const CustomAppBarForSearchPage({
+    required this.onSubmmit,
     required this.onTapSearchBar,
     required this.isFocus,
     required this.onChangeTextInput,
@@ -294,6 +293,9 @@ class CustomAppBarForSearchPage extends StatelessWidget
       ),
       titleSpacing: 0,
       title: TextField(
+        onSubmitted: (value) {
+          onSubmmit(value);
+        },
         autofocus: isFocus,
         onChanged: (value) {
           onChangeTextInput(value);

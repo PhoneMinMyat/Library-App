@@ -38,3 +38,8 @@ const String TOP_SELLING = 'Top selling';
 const String NEW_RELEASES = 'New releases';
 const String BOOKSHOP = 'Bookshop';
 const String RATING_AND_REVIEWS = 'Ratings and reviews';
+
+const String EMPTY_MESSAGE_IN_LIBRAY = 'Sorry!\nThere is no book in your library';
+const String EMPTY_MESSAGE_FOR_SEARCH_RESULT = 'Sorry!\nThere is no book for this category';
+
+const String SIMILAR_EBOOKS = 'Similar Ebooks';

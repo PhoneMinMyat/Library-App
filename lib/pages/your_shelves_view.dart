@@ -1,19 +1,33 @@
 import 'package:flutter/material.dart';
-import 'package:library_app/data/vos/shelve_vo.dart';
+import 'package:library_app/data/vos/shelf_vo.dart';
+import 'package:library_app/dummy_datas.dart';
+import 'package:library_app/pages/add_new_shelf_page.dart';
+import 'package:library_app/pages/shelves_details_page.dart';
 import 'package:library_app/resources/dimens.dart';
 import 'package:library_app/resources/string.dart';
 import 'package:library_app/viewitems/book_shelves_colletion_list_item.dart';
 
-class YourShelvesView extends StatelessWidget {
-  final Function onTapShelvesList;
-  final Function onTapCreateNewShelve;
-  final List<ShelveVO> shelveList;
-  const YourShelvesView(
-    this.onTapShelvesList, {
-    required this.shelveList,
-    required this.onTapCreateNewShelve,
+class YourShelvesView extends StatefulWidget {
+  const YourShelvesView({
     Key? key,
   }) : super(key: key);
+
+  @override
+  State<YourShelvesView> createState() => _YourShelvesViewState();
+}
+
+class _YourShelvesViewState extends State<YourShelvesView> {
+  List<ShelfVO> shelveList = dummyShelveList;
+
+  void onTapCreateShelve() {
+    Navigator.of(context)
+        .push(MaterialPageRoute(builder: (context) => const AddNewShelfPage()));
+  }
+
+  void onTapShelvesList() {
+    Navigator.of(context).push(
+        MaterialPageRoute(builder: (context) => const ShelvesDetailsPage()));
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -38,7 +52,7 @@ class YourShelvesView extends StatelessWidget {
             child: Padding(
               padding: const EdgeInsets.only(bottom: MARGIN_MEDIUM_2x),
               child: CreateNewButton(() {
-                onTapCreateNewShelve();
+                onTapCreateShelve();
               }),
             ))
       ],

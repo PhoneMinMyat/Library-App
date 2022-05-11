@@ -1,15 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:library_app/data/vos/book_vo.dart';
 
 import 'package:library_app/resources/dimens.dart';
 import 'package:library_app/viewitems/image_and_title_section_view.dart';
 
 class BookListItem extends StatelessWidget {
-  final Function onTapBook;
+  final Function(String) onTapBook;
   final Function onTapBookSeeMore;
+  final BookVO book;
   const BookListItem({
     Key? key,
     required this.onTapBook,
     required this.onTapBookSeeMore,
+    required this.book,
   }) : super(key: key);
 
   @override
@@ -23,14 +26,14 @@ class BookListItem extends StatelessWidget {
         children: [
           GestureDetector(
             onTap: () {
-              onTapBook();
+              onTapBook(book.primaryIsbn10 ?? '');
             },
             child: SizedBox(
                 width: MediaQuery.of(context).size.width * 0.7,
-                child: const ImageAndTitleSectionView(
-                  title: 'Never Send a Human to Do a Machine\'s Job',
-                  author: 'Yong Zhao, Gaoming Zhang,Jin Xijinga',
-                  type: 'Ebook . Sample',
+                child: ImageAndTitleSectionView(
+                  imageUrl: book.bookImage ?? '',
+                  title: book.title ?? '',
+                  author: book.author ?? '',
                 )),
           ),
           const Spacer(),

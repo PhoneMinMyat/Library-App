@@ -1,25 +1,49 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
+import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
+import 'package:provider/provider.dart';
+
+import 'package:library_app/bloc/book_details_bloc.dart';
+import 'package:library_app/data/vos/book_list_vo.dart';
+import 'package:library_app/data/vos/book_vo.dart';
 import 'package:library_app/dummy_datas.dart';
 import 'package:library_app/pages/book_collection_details_page.dart';
-import 'package:library_app/viewitems/book_collection_section.dart';
-import 'package:library_app/viewitems/image_and_title_section_view.dart';
-import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
-
 import 'package:library_app/resources/dimens.dart';
 import 'package:library_app/resources/string.dart';
+import 'package:library_app/viewitems/book_collection_section.dart';
+import 'package:library_app/viewitems/image_and_title_section_view.dart';
 
 class BookDetailsPage extends StatefulWidget {
-  const BookDetailsPage({Key? key}) : super(key: key);
+  final String bookId;
+  const BookDetailsPage({
+    Key? key,
+    required this.bookId,
+  }) : super(key: key);
 
   @override
   State<BookDetailsPage> createState() => _BookDetailsPageState();
 }
 
 class _BookDetailsPageState extends State<BookDetailsPage> {
-  void onTapBookItem() {
-    Navigator.of(context)
-        .push(MaterialPageRoute(builder: (context) => const BookDetailsPage()));
+  BookDetailsBloc? _bookDetailsBloc;
+
+  @override
+  void initState() {
+    _bookDetailsBloc = BookDetailsBloc(widget.bookId);
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _bookDetailsBloc?.makeDispose();
+    super.dispose();
+  }
+
+  void onTapBookItem(String bookId) {
+    Navigator.of(context).push(MaterialPageRoute(
+        builder: (context) => BookDetailsPage(
+              bookId: bookId,
+            )));
   }
 
   void onTapBookListMore(String title) {
@@ -29,97 +53,114 @@ class _BookDetailsPageState extends State<BookDetailsPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: const CustomAppBarForBookDetails(),
-      body: SingleChildScrollView(
-        child: Column(
-          //crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            const TitleSectionView(),
-            const SizedBox(
-              height: MARGIN_MEDIUM_2x,
+    return ChangeNotifierProvider(
+      create: (context) => _bookDetailsBloc,
+      child: Scaffold(
+        appBar: const CustomAppBarForBookDetails(),
+        body: SingleChildScrollView(
+          child: Selector<BookDetailsBloc, BookVO?>(
+            selector: (context, bloc) => bloc.book,
+            builder: (context, viewedBook, child) => Column(
+              //crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                TitleSectionView(
+                  author: viewedBook?.author ?? '',
+                  title: viewedBook?.title ?? '',
+                  imageUrl: viewedBook?.bookImage ?? '',
+                ),
+                const SizedBox(
+                  height: MARGIN_MEDIUM_2x,
+                ),
+                const BookRatingAndTypeSection(),
+                const SizedBox(
+                  height: MARGIN_MEDIUM_2x,
+                ),
+                const Padding(
+                  padding: EdgeInsets.symmetric(horizontal: MARGIN_MEDIUM_2x),
+                  child: BuyingSection(),
+                ),
+                const SizedBox(
+                  height: MARGIN_MEDIUM_2x,
+                ),
+                Padding(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: MARGIN_MEDIUM_2x),
+                  child: AboutView(
+                      onTapMore: () {},
+                      title: 'About this eBook',
+                      subTitle: viewedBook?.description ?? ''),
+                ),
+                const SizedBox(
+                  height: MARGIN_MEDIUM_2x,
+                ),
+                const Padding(
+                  padding: EdgeInsets.symmetric(horizontal: MARGIN_MEDIUM_2x),
+                  child: RatingAndReviewSectionView(),
+                ),
+                const SizedBox(
+                  height: MARGIN_MEDIUM_2x,
+                ),
+                Padding(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: MARGIN_MEDIUM_2x),
+                  child: AboutView(
+                    onTapMore: () {},
+                    title: 'About the author',
+                    subTitle:
+                        'It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using \'Content here, content here\', making it look like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text, and a search for \'lorem ipsum\' will uncover many web sites still in their infancy. Various versions have evolved over the years, sometimes by accident, sometimes on purpose (injected humour and the like).',
+                  ),
+                ),
+                const SizedBox(
+                  height: MARGIN_MEDIUM_2x,
+                ),
+                BookCollectionSection(
+                  (bookId) {
+                    onTapBookItem(bookId);
+                  },
+                  listTitleName: 'More by this Authors',
+                  bookCollection: BookListVO(),
+                  onTapMore: (title) {
+                    onTapBookListMore(title);
+                  },
+                ),
+                const SizedBox(
+                  height: MARGIN_MEDIUM_2x,
+                ),
+                Selector<BookDetailsBloc, BookListVO?>(
+                    selector: (context, bloc) => bloc.similarBooks,
+                    shouldRebuild: (previous, next) => previous != next,
+                    builder: (context, similarBooks, child) {
+                      return BookCollectionSection(
+                        (bookId) {
+                          onTapBookItem(bookId);
+                        },
+                        listTitleName: SIMILAR_EBOOKS,
+                        bookCollection: similarBooks ?? BookListVO(),
+                        onTapMore: (title) {
+                          onTapBookListMore(title);
+                        },
+                      );
+                    }),
+                const SizedBox(
+                  height: MARGIN_MEDIUM_2x,
+                ),
+                const Padding(
+                  padding: EdgeInsets.symmetric(horizontal: MARGIN_MEDIUM_2x),
+                  child: RateThisBookSection(),
+                ),
+                const SizedBox(
+                  height: MARGIN_MEDIUM_2x,
+                ),
+                const Padding(
+                  padding: EdgeInsets.symmetric(horizontal: MARGIN_MEDIUM_2x),
+                  child: PolicySectionView(),
+                ),
+                const SizedBox(
+                  height: MARGIN_XXLARGE,
+                ),
+              ],
             ),
-            const BookRatingAndTypeSection(),
-            const SizedBox(
-              height: MARGIN_MEDIUM_2x,
-            ),
-            const Padding(
-              padding: EdgeInsets.symmetric(horizontal: MARGIN_MEDIUM_2x),
-              child: BuyingSection(),
-            ),
-            const SizedBox(
-              height: MARGIN_MEDIUM_2x,
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: MARGIN_MEDIUM_2x),
-              child: AboutView(
-                onTapMore: () {},
-                title: 'About this eBook',
-                subTitle:
-                    'It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using \'Content here, content here\', making it look like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text, and a search for \'lorem ipsum\' will uncover many web sites still in their infancy. Various versions have evolved over the years, sometimes by accident, sometimes on purpose (injected humour and the like).',
-              ),
-            ),
-            const SizedBox(
-              height: MARGIN_MEDIUM_2x,
-            ),
-            const Padding(
-              padding: EdgeInsets.symmetric(horizontal: MARGIN_MEDIUM_2x),
-              child: RatingAndReviewSectionView(),
-            ),
-            const SizedBox(
-              height: MARGIN_MEDIUM_2x,
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: MARGIN_MEDIUM_2x),
-              child: AboutView(
-                onTapMore: () {},
-                title: 'About the author',
-                subTitle:
-                    'It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using \'Content here, content here\', making it look like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text, and a search for \'lorem ipsum\' will uncover many web sites still in their infancy. Various versions have evolved over the years, sometimes by accident, sometimes on purpose (injected humour and the like).',
-              ),
-            ),
-            const SizedBox(
-              height: MARGIN_MEDIUM_2x,
-            ),
-            BookCollectionSection(
-              () {
-                onTapBookItem();
-              },
-              titleName: 'More by this Authors',
-              onTapMore: (title) {
-                onTapBookListMore(title);
-              },
-            ),
-            const SizedBox(
-              height: MARGIN_MEDIUM_2x,
-            ),
-            BookCollectionSection(
-              () {
-                onTapBookItem();
-              },
-              titleName: 'Similar Ebooks',
-              onTapMore: (title) {
-                onTapBookListMore(title);
-              },
-            ),
-            const SizedBox(
-              height: MARGIN_MEDIUM_2x,
-            ),
-            const Padding(
-              padding: EdgeInsets.symmetric(horizontal: MARGIN_MEDIUM_2x),
-              child: RateThisBookSection(),
-            ),
-            const SizedBox(
-              height: MARGIN_MEDIUM_2x,
-            ),
-            const Padding(
-              padding: EdgeInsets.symmetric(horizontal: MARGIN_MEDIUM_2x),
-              child: PolicySectionView(),
-            ),
-            const SizedBox(
-              height: MARGIN_XXLARGE,
-            ),
-          ],
+          ),
         ),
       ),
     );
@@ -187,6 +228,7 @@ class RatingView extends StatelessWidget {
         ),
         Expanded(
           child: ListView.separated(
+            physics: const NeverScrollableScrollPhysics(),
             shrinkWrap: true,
             itemCount: dummyBookList.length,
             itemBuilder: (context, index) {
@@ -241,7 +283,6 @@ class RatingLine extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    print('percent===> $percent');
     return Stack(
       children: [
         Container(
@@ -832,8 +873,14 @@ class BookInfoItem extends StatelessWidget {
 }
 
 class TitleSectionView extends StatelessWidget {
+  final String author;
+  final String title;
+  final String imageUrl;
   const TitleSectionView({
     Key? key,
+    required this.author,
+    required this.title,
+    required this.imageUrl,
   }) : super(key: key);
 
   @override
@@ -842,10 +889,10 @@ class TitleSectionView extends StatelessWidget {
       height: BOOK_DETAILS_TITLE_SECTION_HEIGHT,
       width: double.infinity,
       padding: const EdgeInsets.symmetric(horizontal: MARGIN_MEDIUM_2x),
-      child: const ImageAndTitleSectionView(
-        title: 'Never Send a Human to Do a Machine\'s Job',
-        author: 'Yong Zhao, Gaoming Zhang,Jin Xijinga',
-        type: 'Ebook . Sample',
+      child: ImageAndTitleSectionView(
+        imageUrl: imageUrl,
+        title: title,
+        author: author,
         isListItem: false,
       ),
       // Row(

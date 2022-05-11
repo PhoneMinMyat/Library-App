@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:library_app/data/vos/genre_vo.dart';
+import 'package:library_app/data/vos/book_vo.dart';
+import 'package:library_app/data/vos/category_chip_vo.dart';
 import 'package:library_app/dummy_datas.dart';
 import 'package:library_app/enums.dart';
 import 'package:library_app/pages/book_details_page.dart';
@@ -19,7 +20,7 @@ class _ShelvesDetailsPageState extends State<ShelvesDetailsPage> {
   SortedType sortedType = SortedType.recentlyOpened;
 
   ViewType viewType = ViewType.values[0];
-  List<GenreVO> genreChipList = genreList;
+  List<CategoryChipVO> genreChipList = genreList;
   void onTapChipCancel() {
     genreChipList.forEach((element) {
       setState(() {
@@ -28,9 +29,9 @@ class _ShelvesDetailsPageState extends State<ShelvesDetailsPage> {
     });
   }
 
-  void onTapChip(int id) {
+  void onTapChip(String categoryName) {
     setState(() {
-      genreChipList.firstWhere((element) => element.id == id).onTap();
+      genreChipList.firstWhere((element) => element.name == categoryName).onTap();
     });
   }
 
@@ -73,9 +74,11 @@ class _ShelvesDetailsPageState extends State<ShelvesDetailsPage> {
         });
   }
 
-  void onTapBookItem() {
-    Navigator.of(context)
-        .push(MaterialPageRoute(builder: (context) => const BookDetailsPage()));
+  void onTapBookItem(String bookId) {
+    Navigator.of(context).push(MaterialPageRoute(
+        builder: (context) => BookDetailsPage(
+              bookId: bookId,
+            )));
   }
 
   void onTapChangeView() {
@@ -89,11 +92,13 @@ class _ShelvesDetailsPageState extends State<ShelvesDetailsPage> {
     });
   }
 
-  void onTapBookMore() {
+  void onTapBookMore(BookVO book) {
     showModalBottomSheet(
         context: context,
         builder: (context) {
-          return const BookMoreModalBottomSheetView();
+          return BookMoreModalBottomSheetView(
+            book: book,
+          );
         });
   }
 
@@ -109,11 +114,12 @@ class _ShelvesDetailsPageState extends State<ShelvesDetailsPage> {
           ),
           Expanded(
               child: ReuseableBookLibrayView(
-            onTapBook: () {
-              onTapBookItem();
+            bookList: [],
+            onTapBook: (bookId) {
+              onTapBookItem(bookId);
             },
-            onTapBookSeeMore: () {
-              onTapBookMore();
+            onTapBookSeeMore: (book) {
+              onTapBookMore(book);
             },
             chipList: genreChipList,
             onTapChip: (selectedId) {
