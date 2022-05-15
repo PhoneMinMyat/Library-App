@@ -18,9 +18,15 @@ class GoogleBookModelImpl extends GoogleBookModel {
   GoogleBookModelImpl._internal();
 
   //Network
-  final GoogleBookDataAgent _mDataAgent = RetrofitGoogleBookDataAgentImpl();
+  GoogleBookDataAgent _mDataAgent = RetrofitGoogleBookDataAgentImpl();
 
-  final AllBookDao _mAllBookDao = AllBookDaoImpl();
+  AllBookDao _mAllBookDao = AllBookDaoImpl();
+
+  void setDaoAndDataAgent(
+      GoogleBookDataAgent googleBookDataAgent, AllBookDao allBookDao) {
+    _mAllBookDao = allBookDao;
+    _mDataAgent = googleBookDataAgent;
+  }
 
   @override
   Future<List<BookVO>?> getSearchResultBookList(String searchKey) {
@@ -68,10 +74,9 @@ class GoogleBookModelImpl extends GoogleBookModel {
       tempBookVO.primaryIsbn13 = tempGoogleBookVO.industryIdentifiers
           ?.firstWhereOrNull((element) => element.type == 'ISBN_13')
           ?.identifier;
-      print('${tempBookVO.title} ====> ${tempBookVO.primaryIsbn10}');
       tempBookList.add(tempBookVO);
     });
-    print('tempBookList ===> ${tempBookList.length}');
+   
     return tempBookList;
   }
 }

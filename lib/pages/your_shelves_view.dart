@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:library_app/bloc/your_shelves_view_bloc.dart';
 import 'package:library_app/data/vos/shelf_vo.dart';
-import 'package:library_app/dummy_datas.dart';
 import 'package:library_app/pages/add_new_shelf_page.dart';
 import 'package:library_app/pages/shelves_details_page.dart';
 import 'package:library_app/resources/dimens.dart';
 import 'package:library_app/resources/string.dart';
 import 'package:library_app/viewitems/book_shelves_colletion_list_item.dart';
+import 'package:library_app/viewitems/empty_book_view.dart';
+import 'package:library_app/widget_keys.dart';
+import 'package:library_app/widgets/create_new_button.dart';
+import 'package:provider/provider.dart';
 
 class YourShelvesView extends StatefulWidget {
   const YourShelvesView({
@@ -17,81 +21,72 @@ class YourShelvesView extends StatefulWidget {
 }
 
 class _YourShelvesViewState extends State<YourShelvesView> {
-  List<ShelfVO> shelveList = dummyShelveList;
+  final YourShelvesViewBloc _bloc = YourShelvesViewBloc();
 
   void onTapCreateShelve() {
     Navigator.of(context)
         .push(MaterialPageRoute(builder: (context) => const AddNewShelfPage()));
   }
 
-  void onTapShelvesList() {
-    Navigator.of(context).push(
-        MaterialPageRoute(builder: (context) => const ShelvesDetailsPage()));
+  void onTapShelvesList(int shelvesId) {
+    Navigator.of(context).push(MaterialPageRoute(
+        builder: (context) => ShelvesDetailsPage(
+              shelvesId: shelvesId,
+            )));
+  }
+
+  @override
+  void dispose() {
+    _bloc.makeDispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        Positioned.fill(
-          child: ListView.builder(
-            shrinkWrap: true,
-            itemCount: shelveList.length,
-            itemBuilder: (context, index) {
-              return BookShelvesCollectionListItem(
-                () {
-                  onTapShelvesList();
-                },
-                shelve: shelveList[index],
-              );
-            },
+    return ChangeNotifierProvider(
+      create: (context) => _bloc,
+      builder: (context, child) => Stack(
+        children: [
+          Positioned.fill(
+            child: Selector<YourShelvesViewBloc, List<ShelfVO>?>(
+              selector: (contex, bloc) => bloc.shelveList,
+              shouldRebuild: (previous, next) => previous != next,
+              builder: (context, shelveList, child) =>
+                  (shelveList == null || shelveList.isEmpty)
+                      ? const EmptyBookView(
+                          isYourShelfView: true,
+                        )
+                      : ListView.separated(
+                          key: const Key(KEY_SHELF_LIST_VIEW),
+                          shrinkWrap: true,
+                          itemCount: shelveList.length,
+                          itemBuilder: (context, index) {
+                            return BookShelvesCollectionListItem(
+                              () {
+                                onTapShelvesList(shelveList[index].id ?? 0);
+                              },
+                              shelve: shelveList[index],
+                            );
+                          },
+                          separatorBuilder: (context, index) => const SizedBox(
+                            height: MARGIN_MEDIUM,
+                          ),
+                        ),
+            ),
           ),
-        ),
-        Align(
-            alignment: Alignment.bottomCenter,
-            child: Padding(
-              padding: const EdgeInsets.only(bottom: MARGIN_MEDIUM_2x),
-              child: CreateNewButton(() {
-                onTapCreateShelve();
-              }),
-            ))
-      ],
+          Align(
+              alignment: Alignment.bottomCenter,
+              child: Padding(
+                padding: const EdgeInsets.only(bottom: MARGIN_MEDIUM_2x),
+                child: CreateNewButton(
+                  () {
+                    onTapCreateShelve();
+                  },
+                  text: CREATE_NEW,
+                ),
+              ))
+        ],
+      ),
     );
-  }
-}
-
-class CreateNewButton extends StatelessWidget {
-  final Function onTap;
-  const CreateNewButton(
-    this.onTap, {
-    Key? key,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-        onTap: () {
-          onTap();
-        },
-        child: Container(
-          height: CREATE_NEW_SHELVES_BUTTON_HEIGHT,
-          width: CREATE_NEW_SHELVES_BUTTON_WIDTH,
-          padding: const EdgeInsets.symmetric(horizontal: MARGIN_MEDIUM_2x),
-          decoration: BoxDecoration(
-              color: Colors.blue, borderRadius: BorderRadius.circular(25)),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: const [
-              Icon(
-                Icons.edit,
-                color: Colors.white,
-              ),
-              Text(
-                CREATE_NEW,
-                style: TextStyle(color: Colors.white),
-              )
-            ],
-          ),
-        ));
   }
 }

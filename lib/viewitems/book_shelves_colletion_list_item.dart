@@ -33,10 +33,15 @@ class BookShelvesCollectionListItem extends StatelessWidget {
                   topRight: Radius.circular(MARGIN_MEDIUM)),
               child: SizedBox(
                 width: 60,
-                child: Image.network(
-                  'https://www.skipprichard.com/wp-content/uploads/2016/01/9780062367556.jpg',
-                  fit: BoxFit.cover,
-                ),
+                child: (shelve.bookList?.isEmpty ?? true)
+                    ? Image.asset(
+                        'assets/images/shelves.png',
+                        fit: BoxFit.cover,
+                      )
+                    : Image.network(
+                        shelve.bookList?.first.bookImage ?? '',
+                        fit: BoxFit.cover,
+                      ),
               ),
             ),
             const SizedBox(
@@ -46,18 +51,18 @@ class BookShelvesCollectionListItem extends StatelessWidget {
               width: MediaQuery.of(context).size.width * 0.6,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
-                children:  [
+                children: [
                   Text(
                     shelve.name ?? '',
                     style: const TextStyle(fontWeight: FontWeight.bold),
                   ),
-                const  SizedBox(
+                  const SizedBox(
                     height: MARGIN_SMALL,
                   ),
                   Text(
                     '${shelve.bookList?.length} books',
-                    style:
-                       const TextStyle(fontSize: TEXT_SMALL_2x, color: Colors.grey),
+                    style: const TextStyle(
+                        fontSize: TEXT_SMALL_2x, color: Colors.grey),
                   )
                 ],
               ),

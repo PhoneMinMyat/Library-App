@@ -3,6 +3,7 @@ import 'package:library_app/bloc/search_page_bloc.dart';
 import 'package:library_app/data/vos/book_list_vo.dart';
 import 'package:library_app/debouncer.dart';
 import 'package:library_app/viewitems/image_and_title_section_view.dart';
+import 'package:library_app/widget_keys.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 
 import 'package:library_app/data/vos/book_vo.dart';
@@ -21,7 +22,6 @@ class SearchPage extends StatefulWidget {
 }
 
 class _SearchPageState extends State<SearchPage> {
-
   final _debouncer = Debouncer(milliseconds: 500);
 
   SearchPageBloc? _bloc;
@@ -63,6 +63,7 @@ class _SearchPageState extends State<SearchPage> {
       return Padding(
         padding: const EdgeInsets.symmetric(vertical: MARGIN_MEDIUM_2x),
         child: BookCollectionListViewSection(
+            key: const Key(KEY_SEARCH_RESULT_BOOK_VIEW),
             bookCollectionList: resultByCategoryList,
             onTapBook: (tapBook) {
               onTapBookItem(tapBook);
@@ -75,6 +76,7 @@ class _SearchPageState extends State<SearchPage> {
 
     if (isSearching == true) {
       return SearchingResultView(
+        key: const Key(KEY_SEARCH_SUGGEST_BOOK_LIST),
         resultBookList: resultSearchBook,
         searchWord: searchWordText,
         onTapBook: (bookId) {
@@ -95,6 +97,7 @@ class _SearchPageState extends State<SearchPage> {
       create: (context) => _bloc,
       builder: (context, child) => Consumer<SearchPageBloc>(
         builder: (context, searchBloc, child) => Scaffold(
+          backgroundColor: Colors.white.withOpacity(0.96),
           appBar: CustomAppBarForSearchPage(
             onTapSearchBar: () {
               SearchPageBloc bloc =
@@ -169,7 +172,7 @@ class SearchingResultView extends StatelessWidget {
           }
           return Container(
             padding: const EdgeInsets.symmetric(horizontal: MARGIN_MEDIUM_2x),
-            height: BOOK_BOTTOM_MODAL_LISTTILE_HEIGHT,
+            height: BOOK_SEARCH_RESULT_ITEM_HEIGHT,
             child: GestureDetector(
               onTap: () {
                 onTapBook(resultBookList[index].primaryIsbn10 ?? '');
@@ -200,33 +203,31 @@ class FirstSearchList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          SearchResultItem(
-            onTap: () {
-              onTapSearchItem();
-            },
-            iconData: MdiIcons.chartLineVariant,
-            title: TOP_SELLING,
-          ),
-          SearchResultItem(
-            onTap: () {
-              onTapSearchItem();
-            },
-            iconData: MdiIcons.information,
-            title: NEW_RELEASES,
-          ),
-          SearchResultItem(
-            onTap: () {
-              onTapSearchItem();
-            },
-            iconData: MdiIcons.store,
-            title: BOOKSHOP,
-          ),
-        ],
-      ),
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        SearchResultItem(
+          onTap: () {
+            onTapSearchItem();
+          },
+          iconData: MdiIcons.chartLineVariant,
+          title: TOP_SELLING,
+        ),
+        SearchResultItem(
+          onTap: () {
+            onTapSearchItem();
+          },
+          iconData: MdiIcons.information,
+          title: NEW_RELEASES,
+        ),
+        SearchResultItem(
+          onTap: () {
+            onTapSearchItem();
+          },
+          iconData: MdiIcons.store,
+          title: BOOKSHOP,
+        ),
+      ],
     );
   }
 }
@@ -279,6 +280,7 @@ class CustomAppBarForSearchPage extends StatelessWidget
 
   @override
   Widget build(BuildContext context) {
+    String tempText = '';
     return AppBar(
       backgroundColor: Colors.white,
       elevation: 0,
@@ -289,15 +291,21 @@ class CustomAppBarForSearchPage extends StatelessWidget
         onTap: () {
           Navigator.pop(context);
         },
-        child: const Icon(Icons.arrow_back, color: Colors.black54),
+        child: const Icon(
+          Icons.arrow_back,
+          color: Colors.black54,
+          key: Key(KEY_SEARCH_PAGE_BACK_BUTTON),
+        ),
       ),
       titleSpacing: 0,
       title: TextField(
+        key: const Key(KEY_SEARCH_TEXT_FIELD),
         onSubmitted: (value) {
           onSubmmit(value);
         },
         autofocus: isFocus,
         onChanged: (value) {
+          tempText = value;
           onChangeTextInput(value);
         },
         onTap: () {
@@ -306,6 +314,21 @@ class CustomAppBarForSearchPage extends StatelessWidget
         decoration: const InputDecoration(
             hintText: SEARCH_PLAY_BOOKS, border: InputBorder.none),
       ),
+      actions: [
+        GestureDetector(
+          onTap: () {
+            onSubmmit(tempText);
+          },
+          child: const Icon(
+            Icons.search,
+            color: Colors.black54,
+            key: Key(KEY_SEARCH_ICON_BUTTON),
+          ),
+        ),
+        const SizedBox(
+          width: MARGIN_MEDIUM_2x,
+        )
+      ],
     );
   }
 

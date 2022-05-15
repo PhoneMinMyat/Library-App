@@ -3,6 +3,7 @@ import 'package:library_app/data/vos/book_vo.dart';
 
 import 'package:library_app/resources/dimens.dart';
 import 'package:library_app/viewitems/image_and_title_section_view.dart';
+import 'package:library_app/widget_keys.dart';
 
 class BookListItem extends StatelessWidget {
   final Function(String) onTapBook;
@@ -47,8 +48,9 @@ class BookListItem extends StatelessWidget {
             onTap: () {
               onTapBookSeeMore();
             },
-            child: const Icon(
+            child: Icon(
               Icons.more_horiz,
+              key: Key((book.title ?? '') + KEY_SEE_MORE_BUTTON),
               color: Colors.grey,
               size: MARGIN_MEDIUM_3x,
             ),

@@ -61,6 +61,7 @@ class YourBookViewBloc extends ChangeNotifier {
       element.isSelected = false;
     });
     filterBook();
+
     safeNotifyListeners();
   }
 
@@ -69,6 +70,16 @@ class YourBookViewBloc extends ChangeNotifier {
         ?.firstWhere((element) => element.name == categoryName)
         .onTap();
     filterBook();
+    List<CategoryChipVO> tempChipList = categoryChipList ?? [];
+    tempChipList.sort(((a, b) {
+      if (b.isSelected) {
+        return 1;
+      } else {
+        return -1;
+      }
+    }));
+
+    categoryChipList = tempChipList;
     safeNotifyListeners();
   }
 
@@ -103,6 +114,11 @@ class YourBookViewBloc extends ChangeNotifier {
     } else {
       viewType = ViewType.values[0];
     }
+    safeNotifyListeners();
+  }
+
+  void deleteBookFromLibrary(String bookId) {
+    _nyTimesModel.deleteViewBook(bookId);
     safeNotifyListeners();
   }
 

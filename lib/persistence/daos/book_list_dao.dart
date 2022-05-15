@@ -10,4 +10,5 @@ abstract class BookListDao{
   Stream<void> getBookListEventStream();
 
   Stream<List<BookListVO>> getBookListStream();
+  
 }

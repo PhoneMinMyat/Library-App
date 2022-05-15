@@ -1,6 +1,6 @@
-
 import 'package:flutter/material.dart';
 import 'package:library_app/pages/search_page.dart';
+import 'package:library_app/widget_keys.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 
 import 'package:library_app/data/vos/category_chip_vo.dart';
@@ -46,7 +46,7 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-        backgroundColor: Colors.white,
+        backgroundColor: Colors.white.withOpacity(0.96),
         body: Stack(
           children: [
             PageView(
@@ -71,9 +71,18 @@ class _HomePageState extends State<HomePage> {
           onTap: (selectedIndex) => tapBottomNavigationButton(selectedIndex),
           items: const [
             BottomNavigationBarItem(
-                icon: Icon(MdiIcons.homeOutline), label: HOME),
+              icon: Icon(
+                MdiIcons.homeOutline,
+                key: Key(KEY_HOME_PAGE_BOTTOM_NAVIAGATION_BAR_HOME),
+              ),
+              label: HOME,
+            ),
             BottomNavigationBarItem(
-                icon: Icon(Icons.library_books_outlined), label: LIBRARY),
+                icon: Icon(
+                  Icons.library_books_outlined,
+                  key: Key(KEY_HOME_PAGE_BOTTOM_NAVIAGATION_BAR_LIBRARY),
+                ),
+                label: LIBRARY),
           ],
         ),
       ),
@@ -93,12 +102,13 @@ class CustomAppBarWithSearchBar extends StatelessWidget {
     return Container(
       width: double.infinity,
       height: APPBAR_HEIGHT,
-      color: Colors.white,
+      color: Colors.white.withOpacity(0.99),
       child: Container(
         margin: const EdgeInsets.symmetric(
             horizontal: MARGIN_MEDIUM_2x, vertical: MARGIN_CARD_MEDIUM_2),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(SEARCH_BAR_BORDER_RADIUS),
+        
         ),
         child: Card(
           elevation: 3,

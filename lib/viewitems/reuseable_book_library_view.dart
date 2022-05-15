@@ -5,6 +5,7 @@ import 'package:library_app/enums.dart';
 import 'package:library_app/resources/dimens.dart';
 import 'package:library_app/viewitems/book_list_view_item.dart';
 import 'package:library_app/viewitems/book_view_item.dart';
+import 'package:library_app/widget_keys.dart';
 
 class ReuseableBookLibrayView extends StatelessWidget {
   final Function(String) onTapChip;
@@ -77,6 +78,7 @@ class ReuseableBookLibrayView extends StatelessWidget {
       switch (viewType) {
         case ViewType.list:
           return BookListView(
+            key: const Key(KEY_RESUABLE_LISTVIEW),
             bookList: bookList,
             onTapBook: (bookId) {
               onTapBook(bookId);
@@ -87,6 +89,7 @@ class ReuseableBookLibrayView extends StatelessWidget {
           );
         case ViewType.largeItems:
           return BookGridView(
+            key: const Key(KEY_RESUABLE_GRIDVIEW_LARGE),
             bookList: getBookList(),
             crossAxisCount: 2,
             onTapBook: (bookId) {
@@ -95,6 +98,7 @@ class ReuseableBookLibrayView extends StatelessWidget {
           );
         case ViewType.mediumItems:
           return BookGridView(
+            key: const Key(KEY_RESUABLE_GRIDVIEW_SMALL),
             bookList: getBookList(),
             crossAxisCount: 3,
             onTapBook: (bookId) {
@@ -122,7 +126,7 @@ class ReuseableBookLibrayView extends StatelessWidget {
             isChipSelect: isChipSelect,
             chipList: chipList,
             onTapChipCancel: onTapChipCancel,
-            onTapChip: (categoryName){
+            onTapChip: (categoryName) {
               onTapChip(categoryName);
             }),
         const SizedBox(
@@ -147,7 +151,7 @@ class ReuseableBookLibrayView extends StatelessWidget {
             child: _getBookListOptions(),
           ),
         ),
-          const SizedBox(
+        const SizedBox(
           height: MARGIN_MEDIUM_2x,
         ),
       ],
@@ -206,6 +210,7 @@ class BookListView extends StatelessWidget {
         shrinkWrap: true,
         itemBuilder: (context, index) {
           return BookListItem(
+            key: Key(KEY_YOUR_BOOK_VIEW_BOOK_LIST_ITEM + index.toString()),
             book: bookList[index],
             onTapBook: (bookId) {
               onTapBook(bookId);
@@ -267,6 +272,7 @@ class SortAndViewSectionView extends StatelessWidget {
           },
           child: Icon(
             viewIconData,
+            key: const Key(KEY_CHANGE_VIEW_BUTTON),
             color: Colors.grey,
           ),
         )

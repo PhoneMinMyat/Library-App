@@ -3,9 +3,11 @@ import 'package:library_app/data/vos/book_vo.dart';
 abstract class ViewedBookDao{
   void saveViewedBook(BookVO viewedBook);
 
+  void deleteViewedBook(String bookId);
+
   List<BookVO> getAllViewedBooks();
 
-  BookVO? getBookByIdFromDatabase(int id);
+  BookVO? getBookByIdFromDatabase(String id);
 
   List<BookVO> filterBookByCategory(List<String> categoryList);
   //Reactive

@@ -25,6 +25,7 @@ class BookViewItem extends StatelessWidget {
         onTapBook(book.primaryIsbn10 ?? '');
       },
       child: Container(
+       
         width:  BOOK_ITEM_WIDTH,
         margin: const EdgeInsets.only(right: MARGIN_MEDIUM),
         child: Column(

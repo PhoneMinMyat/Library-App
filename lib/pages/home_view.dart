@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:library_app/pages/book_collection_details_page.dart';
 import 'package:library_app/pages/book_details_page.dart';
 import 'package:library_app/resources/string.dart';
+import 'package:library_app/widget_keys.dart';
 import 'package:provider/provider.dart';
 
 import 'package:library_app/bloc/home_view_bloc.dart';
@@ -53,13 +54,17 @@ class _HomeViewState extends State<HomeView> {
                 padding: (recentViewedBookList?.isNotEmpty ?? false)
                     ? const EdgeInsets.symmetric(vertical: MARGIN_MEDIUM_2x)
                     : null,
-                child: CarouselSliderSectionView(
-                  recentViewedList: recentViewedBookList ?? [],
-                  onTapCarousel: (bookId) {
-                    Navigator.of(context).push(MaterialPageRoute(
-                        builder: (context) => BookDetailsPage(bookId: bookId)));
-                  },
-                ),
+                child: (recentViewedBookList?.isNotEmpty ?? false)
+                    ? CarouselSliderSectionView(
+                        key: const Key(KEY_CAROUSEL_SECTION),
+                        recentViewedList: recentViewedBookList ?? [],
+                        onTapCarousel: (bookId) {
+                          Navigator.of(context).push(MaterialPageRoute(
+                              builder: (context) =>
+                                  BookDetailsPage(bookId: bookId)));
+                        },
+                      )
+                    : Container(),
               ),
             ),
             const SizedBox(
@@ -115,6 +120,7 @@ class CarouselSliderSectionView extends StatelessWidget {
       itemCount: recentViewedList.length,
       itemBuilder: (context, itemIndex, pageViewIndex) {
         return CarouselBookItem(
+          key: Key(KEY_CAROUSEL_ITEM + itemIndex.toString()),
           book: recentViewedList[itemIndex],
           onTapCarousel: (bookId) {
             onTapCarousel(bookId);

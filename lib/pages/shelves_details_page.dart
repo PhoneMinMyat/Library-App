@@ -1,76 +1,49 @@
 import 'package:flutter/material.dart';
+import 'package:library_app/bloc/shelves_details_page_bloc.dart';
 import 'package:library_app/data/vos/book_vo.dart';
-import 'package:library_app/data/vos/category_chip_vo.dart';
-import 'package:library_app/dummy_datas.dart';
-import 'package:library_app/enums.dart';
 import 'package:library_app/pages/book_details_page.dart';
 import 'package:library_app/resources/dimens.dart';
 import 'package:library_app/resources/string.dart';
 import 'package:library_app/viewitems/book_more_bottom_modal_sheet_view.dart';
 import 'package:library_app/viewitems/reuseable_book_library_view.dart';
+import 'package:library_app/viewitems/sort_model_bottom_sheet_view.dart';
+import 'package:library_app/widget_keys.dart';
+import 'package:provider/provider.dart';
 
 class ShelvesDetailsPage extends StatefulWidget {
-  const ShelvesDetailsPage({Key? key}) : super(key: key);
+  final int shelvesId;
+  const ShelvesDetailsPage({required this.shelvesId, Key? key})
+      : super(key: key);
 
   @override
   State<ShelvesDetailsPage> createState() => _ShelvesDetailsPageState();
 }
 
 class _ShelvesDetailsPageState extends State<ShelvesDetailsPage> {
-  SortedType sortedType = SortedType.recentlyOpened;
+  ShelvesDetailsPageBloc? _bloc;
 
-  ViewType viewType = ViewType.values[0];
-  List<CategoryChipVO> genreChipList = genreList;
-  void onTapChipCancel() {
-    genreChipList.forEach((element) {
-      setState(() {
-        element.isSelected = false;
-      });
-    });
+  @override
+  void initState() {
+    _bloc = ShelvesDetailsPageBloc(widget.shelvesId);
+    super.initState();
   }
 
-  void onTapChip(String categoryName) {
-    setState(() {
-      genreChipList.firstWhere((element) => element.name == categoryName).onTap();
-    });
-  }
-
-  void changeSort(SortedType selectedSortedType) {
-    setState(() {
-      sortedType = selectedSortedType;
-    });
+  @override
+  void dispose() {
+    _bloc?.makeDispose();
+    super.dispose();
   }
 
   void onTapChangeSort() {
+    int radioValue = _bloc?.sortedType.index ?? 0;
     showModalBottomSheet(
         context: context,
         builder: (context) {
-          return Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              ListTile(
-                title: const Text(SORT_BY_RECENT),
-                onTap: () {
-                  changeSort(SortedType.recentlyOpened);
-                  Navigator.pop(context);
-                },
-              ),
-              ListTile(
-                title: const Text(SORT_BY_TITLE),
-                onTap: () {
-                  changeSort(SortedType.title);
-                  Navigator.pop(context);
-                },
-              ),
-              ListTile(
-                title: const Text(SORT_BY_AUTHOR),
-                onTap: () {
-                  changeSort(SortedType.author);
-                  Navigator.pop(context);
-                },
-              ),
-            ],
-          );
+          return SortModalBottomSheetView(
+              radioVal: radioValue,
+              tapRadioButton: (radioValue) {
+                _bloc?.changeSort(radioValue);
+              });
         });
   }
 
@@ -81,15 +54,58 @@ class _ShelvesDetailsPageState extends State<ShelvesDetailsPage> {
             )));
   }
 
-  void onTapChangeView() {
-    int tempViewIndex = viewType.index;
-    setState(() {
-      if (tempViewIndex < 2) {
-        viewType = ViewType.values[tempViewIndex + 1];
-      } else {
-        viewType = ViewType.values[0];
-      }
-    });
+  void onTapDeleteShelf() async {
+    print('Tap Delete');
+    await Future.delayed(Duration(milliseconds: 500));
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text(DELETE_SHELF),
+        content: const Text(DELETE_SHELF_CONTENT),
+        actions: [
+          GestureDetector(
+            onTap: () {
+              Navigator.pop(context);
+            },
+            child: const Text(CANCEL),
+          ),
+          GestureDetector(
+            onTap: () {
+              _bloc?.deleteShelf();
+              Navigator.pop(context);
+              Navigator.pop(context);
+            },
+            child: const Text(CONFIRM),
+          ),
+        ],
+        actionsPadding: const EdgeInsets.all(MARGIN_MEDIUM_2x),
+      ),
+    );
+  }
+
+  void onTapDeleteBook() {
+    showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+              title: const Text(DELETE_FROM_LIB),
+              content: const Text(CONFIRM_DELETE_BOOK),
+              actions: [
+                GestureDetector(
+                  onTap: () {
+                    Navigator.pop(context);
+                  },
+                  child: const Text(CANCEL),
+                ),
+                GestureDetector(
+                  onTap: () {
+                    print('Confirm');
+                    Navigator.pop(context);
+                  },
+                  child: const Text(CONFIRM),
+                ),
+              ],
+              actionsPadding: const EdgeInsets.all(MARGIN_MEDIUM_2x),
+            ));
   }
 
   void onTapBookMore(BookVO book) {
@@ -98,53 +114,120 @@ class _ShelvesDetailsPageState extends State<ShelvesDetailsPage> {
         builder: (context) {
           return BookMoreModalBottomSheetView(
             book: book,
+            isYourBookView: false,
+            addToShelf: (bookId) {
+              _bloc?.removeBookFromShelf(bookId);
+              Navigator.pop(context);
+            },
+            deleteFromLibrary: (bookId) {
+              // onTapDeleteBook(bookId);
+            },
           );
         });
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: const CustomAppBarForShelves(),
-      body: Column(
-        children: [
-          const TitleSectionView(),
-          const SizedBox(
-            height: MARGIN_MEDIUM_2x,
-          ),
-          Expanded(
-              child: ReuseableBookLibrayView(
-            bookList: [],
-            onTapBook: (bookId) {
-              onTapBookItem(bookId);
-            },
-            onTapBookSeeMore: (book) {
-              onTapBookMore(book);
-            },
-            chipList: genreChipList,
-            onTapChip: (selectedId) {
-              onTapChip(selectedId);
-            },
-            onTapChipCancel: () {
-              onTapChipCancel();
-            },
-            sortedType: sortedType,
-            onChangeSort: () {
-              onTapChangeSort();
-            },
-            viewType: viewType,
-            onChangeView: () {
-              onTapChangeView();
-            },
-          ))
-        ],
+    return ChangeNotifierProvider(
+      create: (context) => _bloc,
+      builder: (context, child) => Consumer<ShelvesDetailsPageBloc>(
+        builder: (context, bloc, child) {
+          String tempText = '';
+          return Scaffold(
+            backgroundColor: Colors.white.withOpacity(0.96),
+            appBar: CustomAppBarForShelves(
+              onTapRename: () {
+                ShelvesDetailsPageBloc bloc =
+                    Provider.of<ShelvesDetailsPageBloc>(context, listen: false);
+                bloc.onTapRename();
+              },
+              onTapDelete: () {
+                onTapDeleteShelf();
+              },
+              confimEdit: () {
+                print('confirm edit');
+                ShelvesDetailsPageBloc bloc =
+                    Provider.of<ShelvesDetailsPageBloc>(context, listen: false);
+                bloc.renameShelf(tempText);
+              },
+              isEditing: bloc.isEditing,
+            ),
+            body: Column(
+              children: [
+                TitleSectionView(
+                  title: bloc.shelfTitle ?? '',
+                  bookCounts:
+                      (bloc.allBookListFromShelf?.length ?? 0).toString(),
+                  isEditing: bloc.isEditing,
+                  onChange: (newValue) {
+                    tempText = newValue;
+                  },
+                  onSubmitted: (inputText) {
+                    ShelvesDetailsPageBloc bloc =
+                        Provider.of<ShelvesDetailsPageBloc>(context,
+                            listen: false);
+                    bloc.renameShelf(inputText);
+                  },
+                ),
+                const SizedBox(
+                  height: MARGIN_MEDIUM_2x,
+                ),
+                Expanded(
+                    child: ReuseableBookLibrayView(
+                  key: const Key(KEY_SHELF_BOOK_LIST_VIEW),
+                  bookList: bloc.bookListFromShelf ?? [],
+                  onTapBook: (bookId) {
+                    onTapBookItem(bookId);
+                  },
+                  onTapBookSeeMore: (book) {
+                    onTapBookMore(book);
+                  },
+                  chipList: bloc.categoryChipList ?? [],
+                  onTapChip: (selectedId) {
+                    ShelvesDetailsPageBloc bloc =
+                        Provider.of<ShelvesDetailsPageBloc>(context,
+                            listen: false);
+                    bloc.onTapChip(selectedId);
+                  },
+                  onTapChipCancel: () {
+                    ShelvesDetailsPageBloc bloc =
+                        Provider.of<ShelvesDetailsPageBloc>(context,
+                            listen: false);
+                    bloc.onTapChipCancel();
+                  },
+                  sortedType: bloc.sortedType,
+                  onChangeSort: () {
+                    onTapChangeSort();
+                  },
+                  viewType: bloc.viewType,
+                  onChangeView: () {
+                    ShelvesDetailsPageBloc bloc =
+                        Provider.of<ShelvesDetailsPageBloc>(context,
+                            listen: false);
+                    bloc.onTapChangeView();
+                  },
+                ))
+              ],
+            ),
+          );
+        },
       ),
     );
   }
 }
 
 class TitleSectionView extends StatelessWidget {
+  final String title;
+  final String bookCounts;
+  final Function(String) onSubmitted;
+  final bool isEditing;
+  final Function(String) onChange;
   const TitleSectionView({
+    required this.title,
+    required this.bookCounts,
+    required this.onSubmitted,
+    required this.isEditing,
+    required this.onChange,
     Key? key,
   }) : super(key: key);
 
@@ -158,18 +241,38 @@ class TitleSectionView extends StatelessWidget {
           border: Border(bottom: BorderSide(color: Colors.black, width: 0.2))),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-        children: const [
-          Text(
-            '10 Interaction Design Books To Read',
-            style: TextStyle(
-                fontWeight: FontWeight.w500, fontSize: TEXT_HEADING_2X),
-          ),
-          SizedBox(
+        children: [
+          (isEditing)
+              ? TextFormField(
+                  key: const Key(KEY_SHELF_DETAILS_TEXT_FIELD),
+                  autofocus: isEditing,
+                  //readOnly: !isEditing,
+                  decoration: const InputDecoration(border: InputBorder.none),
+                  initialValue: title,
+                  onFieldSubmitted: (inputText) {
+                    onSubmitted(inputText);
+                  },
+                  style: const TextStyle(
+                      fontWeight: FontWeight.w500,
+                      fontSize: TEXT_HEADING_2X,
+                      color: Colors.black87),
+                  onChanged: (newValue) {
+                    onChange(newValue);
+                  },
+                )
+              : Text(
+                  title,
+                  style: const TextStyle(
+                      fontWeight: FontWeight.w500,
+                      fontSize: TEXT_HEADING_2X,
+                      color: Colors.black87),
+                ),
+          const SizedBox(
             height: MARGIN_MEDIUM,
           ),
           Text(
-            '3 books',
-            style: TextStyle(color: Colors.grey),
+            '$bookCounts books',
+            style: const TextStyle(color: Colors.grey),
           ),
         ],
       ),
@@ -179,7 +282,15 @@ class TitleSectionView extends StatelessWidget {
 
 class CustomAppBarForShelves extends StatelessWidget
     implements PreferredSizeWidget {
+  final Function onTapRename;
+  final Function onTapDelete;
+  final Function confimEdit;
+  final bool isEditing;
   const CustomAppBarForShelves({
+    required this.onTapDelete,
+    required this.onTapRename,
+    required this.confimEdit,
+    required this.isEditing,
     Key? key,
   })  : preferredSize = const Size.fromHeight(56.0),
         super(key: key);
@@ -187,17 +298,23 @@ class CustomAppBarForShelves extends StatelessWidget
   @override
   Widget build(BuildContext context) {
     return AppBar(
-      backgroundColor: Colors.white,
+      backgroundColor: Colors.white.withOpacity(0.80),
       elevation: 0,
       automaticallyImplyLeading: false,
       leading: GestureDetector(
         onTap: () {
-          Navigator.pop(context);
+          (isEditing)
+              ? () {
+                  print('confim from Appbar');
+                  confimEdit();
+                }
+              : Navigator.pop(context);
         },
-        child: const Icon(
-          Icons.chevron_left,
+        child: Icon(
+          (isEditing) ? Icons.check : Icons.chevron_left,
           color: Colors.grey,
           size: MARGIN_XLARGE,
+          key: const Key(KEY_SHELF_DETAILS_PAGE_BACK_BUTTON),
         ),
       ),
       actions: [
@@ -206,19 +323,22 @@ class CustomAppBarForShelves extends StatelessWidget
               Icons.more_horiz,
               color: Colors.grey,
               size: MARGIN_XLARGE,
+              key: Key(KEY_SHELF_DETAILS_POPUP_MENU_BUTTON),
             ),
             itemBuilder: (context) {
               return [
                 PopupMenuItem(
+                  key: const Key(KEY_SHELF_DETAILS_RENAME),
                   child: const Text('Rename shelf'),
                   onTap: () {
-                    print('Rename');
+                    onTapRename();
                   },
                 ),
                 PopupMenuItem(
+                  key: const Key(KEY_SHELF_DETAILS_DELETE),
                   child: const Text('Delete shelf'),
                   onTap: () {
-                    print('Delete');
+                    onTapDelete();
                   },
                 ),
               ];

@@ -28,6 +28,7 @@ const String DOWNLOAD = 'Download';
 const String DELETE_FROM_LIB = 'Delete from library';
 const String MARK_AS_FINISHED = 'Mark as finished';
 const String ADD_TO_SHELF = 'Add to shelf';
+const String REMOVIE_FROM_SHELF = 'Remove From Shelf';
 const String ABOUT_THIS_BOOK = 'About this book';
 
 const String CREATE_NEW = 'Create new';
@@ -41,5 +42,17 @@ const String RATING_AND_REVIEWS = 'Ratings and reviews';
 
 const String EMPTY_MESSAGE_IN_LIBRAY = 'Sorry!\nThere is no book in your library';
 const String EMPTY_MESSAGE_FOR_SEARCH_RESULT = 'Sorry!\nThere is no book for this category';
+const String EMPTY_MESSAGE_FOR_SHELF = 'Your shelf is empty';
 
 const String SIMILAR_EBOOKS = 'Similar Ebooks';
+
+const String ADD_TO_SHELF_TITLE = 'Add to shelf';
+const String CONFIRM_DELETE_BOOK = 'Are you sure to delete this book from library?';
+
+const String CANCEL = 'Cancel';
+const String CONFIRM = 'Confirm';
+
+const String ADD_NEW_SHELF = 'Add new shelf';
+
+const String DELETE_SHELF = 'Delete Shelf';
+const String DELETE_SHELF_CONTENT = 'Are you sure to delete this shelf from library?';

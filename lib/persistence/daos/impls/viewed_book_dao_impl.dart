@@ -13,13 +13,18 @@ class ViewedBookDaoImpl extends ViewedBookDao {
   }
 
   @override
+  void deleteViewedBook(String bookId) {
+    getBookBox().delete(bookId);
+  }
+
+  @override
   List<BookVO> getAllViewedBooks() {
     return getBookBox().values.toList();
   }
 
   @override
-  BookVO? getBookByIdFromDatabase(int id) {
-    return getBookBox().get(id.toString());
+  BookVO? getBookByIdFromDatabase(String id) {
+    return getBookBox().get(id);
   }
 
   //Reactive

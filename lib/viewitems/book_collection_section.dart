@@ -20,38 +20,47 @@ class BookCollectionSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return (bookCollection.booksList?.isEmpty ?? true)? Container() :Column(
-      // mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: MARGIN_MEDIUM_2x),
-          child: TitleSectionView(
-            titleName: listTitleName,
-            onTapMore: (title) {
-              onTapMore((title == SIMILAR_EBOOKS)? bookCollection.listName ?? '' : title);
-            },
-          ),
-        ),
-        const SizedBox(
-          height: MARGIN_MEDIUM,
-        ),
-        SizedBox(
-          height: HORIZONTAL_BOOK_LIST_VIEW_HEIGHT,
-          child: ListView.builder(
-              padding: const EdgeInsets.only(left: MARGIN_MEDIUM_2x),
-              itemCount: bookCollection.booksList?.length ?? 0,
-              shrinkWrap: true,
-              scrollDirection: Axis.horizontal,
-              itemBuilder: (context, index) {
-                return BookViewItem((bookId) {
-                  onTapBookItem(bookId);
-                },
-                book: bookCollection.booksList?[index] ?? BookVO(),);
-              }),
-        )
-      ],
-    );
+    return (bookCollection.booksList?.isEmpty ?? true)
+        ? Container()
+        : Column(
+            // mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Padding(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: MARGIN_MEDIUM_2x),
+                child: TitleSectionView(
+                  titleName: listTitleName,
+                  onTapMore: (title) {
+                    onTapMore((title == SIMILAR_EBOOKS)
+                        ? bookCollection.listName ?? ''
+                        : title);
+                  },
+                ),
+              ),
+              const SizedBox(
+                height: MARGIN_MEDIUM,
+              ),
+              SizedBox(
+                height: HORIZONTAL_BOOK_LIST_VIEW_HEIGHT,
+                child: ListView.builder(
+                    padding: const EdgeInsets.only(left: MARGIN_MEDIUM_2x),
+                    itemCount: bookCollection.booksList?.length ?? 0,
+                    shrinkWrap: true,
+                    scrollDirection: Axis.horizontal,
+                    itemBuilder: (context, index) {
+                      return BookViewItem(
+                        (bookId) {
+                          onTapBookItem(bookId);
+                        },
+                        key: Key(listTitleName +
+                            (bookCollection.booksList?[index].title ?? '')),
+                        book: bookCollection.booksList?[index] ?? BookVO(),
+                      );
+                    }),
+              )
+            ],
+          );
   }
 }
 
@@ -66,21 +75,21 @@ class TitleSectionView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Text(
-          titleName,
-          style: const TextStyle(
-              fontSize: TEXT_REGULAR_2x, fontWeight: FontWeight.w600),
-        ),
-        const Spacer(),
-        GestureDetector(
-          onTap: () {
-            onTapMore(titleName);
-          },
-          child: const Icon(Icons.navigate_next),
-        )
-      ],
+    return GestureDetector(
+      onTap: () {
+        onTapMore(titleName);
+      },
+      child: Row(
+        children: [
+          Text(
+            titleName,
+            style: const TextStyle(
+                fontSize: TEXT_REGULAR_2x, fontWeight: FontWeight.w600),
+          ),
+          const Spacer(),
+          const Icon(Icons.navigate_next)
+        ],
+      ),
     );
   }
 }

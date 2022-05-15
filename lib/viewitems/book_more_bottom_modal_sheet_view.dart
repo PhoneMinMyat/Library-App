@@ -3,11 +3,19 @@ import 'package:library_app/data/vos/book_vo.dart';
 import 'package:library_app/resources/dimens.dart';
 import 'package:library_app/resources/string.dart';
 import 'package:library_app/viewitems/image_and_title_section_view.dart';
+import 'package:library_app/widget_keys.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 
 class BookMoreModalBottomSheetView extends StatelessWidget {
   final BookVO book;
-  const BookMoreModalBottomSheetView({required this.book,
+  final Function(String) addToShelf;
+  final Function(String) deleteFromLibrary;
+  final bool isYourBookView;
+  const BookMoreModalBottomSheetView({
+    required this.book,
+    required this.addToShelf,
+    required this.deleteFromLibrary,
+    this.isYourBookView = true,
     Key? key,
   }) : super(key: key);
 
@@ -21,11 +29,11 @@ class BookMoreModalBottomSheetView extends StatelessWidget {
             padding: const EdgeInsets.symmetric(
                 horizontal: MARGIN_MEDIUM_3x, vertical: MARGIN_MEDIUM),
             height: BOOK_BOTTOM_MODAL_TITLE_HEIGHT,
-            child:  ImageAndTitleSectionView(
-                imageUrl: book.bookImage ?? '',
-                  title: book.title ?? '',
-                  author: book.author ?? '',
-                ),
+            child: ImageAndTitleSectionView(
+              imageUrl: book.bookImage ?? '',
+              title: book.title ?? '',
+              author: book.author ?? '',
+            ),
           ),
           Container(
             decoration: const BoxDecoration(
@@ -35,7 +43,16 @@ class BookMoreModalBottomSheetView extends StatelessWidget {
           const SizedBox(
             height: MARGIN_MEDIUM,
           ),
-          const ActionSectionView()
+          ActionSectionView(
+            addToShelf: (bookId) {
+              addToShelf(bookId);
+            },
+            deleteFromLibrary: (bookId) {
+              deleteFromLibrary(bookId);
+            },
+            bookId: book.primaryIsbn10 ?? '',
+            isYourBookView: isYourBookView,
+          )
         ],
       ),
     );
@@ -43,7 +60,15 @@ class BookMoreModalBottomSheetView extends StatelessWidget {
 }
 
 class ActionSectionView extends StatelessWidget {
+  final Function(String) addToShelf;
+  final Function(String) deleteFromLibrary;
+  final String bookId;
+  final bool isYourBookView;
   const ActionSectionView({
+    required this.addToShelf,
+    required this.deleteFromLibrary,
+    required this.bookId,
+    required this.isYourBookView,
     Key? key,
   }) : super(key: key);
 
@@ -51,8 +76,8 @@ class ActionSectionView extends StatelessWidget {
   Widget build(BuildContext context) {
     return SizedBox(
       child: Column(
-        children: const [
-          SizedBox(
+        children: [
+          const SizedBox(
             height: BOOK_BOTTOM_MODAL_LISTTILE_HEIGHT,
             child: ListTile(
               horizontalTitleGap: 0,
@@ -66,7 +91,7 @@ class ActionSectionView extends StatelessWidget {
               ),
             ),
           ),
-          SizedBox(
+          const SizedBox(
             height: BOOK_BOTTOM_MODAL_LISTTILE_HEIGHT,
             child: ListTile(
               horizontalTitleGap: 0,
@@ -80,21 +105,26 @@ class ActionSectionView extends StatelessWidget {
               ),
             ),
           ),
-          SizedBox(
-            height: BOOK_BOTTOM_MODAL_LISTTILE_HEIGHT,
-            child: ListTile(
-              horizontalTitleGap: 0,
-              leading: Icon(
-                MdiIcons.trashCanOutline,
-                color: Colors.black87,
-              ),
-              title: Text(
-                DELETE_FROM_LIB,
-                style: TextStyle(color: Colors.black87),
+          GestureDetector(
+            onTap: () {
+              deleteFromLibrary(bookId);
+            },
+            child: const SizedBox(
+              height: BOOK_BOTTOM_MODAL_LISTTILE_HEIGHT,
+              child: ListTile(
+                horizontalTitleGap: 0,
+                leading: Icon(
+                  MdiIcons.trashCanOutline,
+                  color: Colors.black87,
+                ),
+                title: Text(
+                  DELETE_FROM_LIB,
+                  style: TextStyle(color: Colors.black87),
+                ),
               ),
             ),
           ),
-          SizedBox(
+          const SizedBox(
             height: BOOK_BOTTOM_MODAL_LISTTILE_HEIGHT,
             child: ListTile(
               horizontalTitleGap: 0,
@@ -108,21 +138,27 @@ class ActionSectionView extends StatelessWidget {
               ),
             ),
           ),
-          SizedBox(
-            height: BOOK_BOTTOM_MODAL_LISTTILE_HEIGHT,
-            child: ListTile(
-              horizontalTitleGap: 0,
-              leading: Icon(
-                MdiIcons.plus,
-                color: Colors.black87,
-              ),
-              title: Text(
-                ADD_TO_SHELF,
-                style: TextStyle(color: Colors.black87),
+          GestureDetector(
+            onTap: () {
+              addToShelf(bookId);
+            },
+            child: SizedBox(
+              key: const Key(KEY_ADD_TO_SHELF),
+              height: BOOK_BOTTOM_MODAL_LISTTILE_HEIGHT,
+              child: ListTile(
+                horizontalTitleGap: 0,
+                leading: Icon(
+                  (isYourBookView) ? MdiIcons.plus : MdiIcons.minus,
+                  color: Colors.black87,
+                ),
+                title: Text(
+                  (isYourBookView) ? ADD_TO_SHELF : REMOVIE_FROM_SHELF,
+                  style: const TextStyle(color: Colors.black87),
+                ),
               ),
             ),
           ),
-          SizedBox(
+          const SizedBox(
             height: BOOK_BOTTOM_MODAL_LISTTILE_HEIGHT,
             child: ListTile(
               horizontalTitleGap: 0,

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
+import 'package:library_app/widget_keys.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:provider/provider.dart';
 
@@ -327,7 +328,7 @@ class BigRatingView extends StatelessWidget {
         RatingBar.builder(
             itemSize: MARGIN_MEDIUM_2x,
             initialRating: 3,
-            itemBuilder: (context, int) {
+            itemBuilder: (context, index) {
               return const Icon(
                 Icons.star,
                 color: Colors.blue,
@@ -458,7 +459,7 @@ class RatingAndDateSection extends StatelessWidget {
         RatingBar.builder(
             itemSize: MARGIN_MEDIUM_2x,
             initialRating: 3,
-            itemBuilder: (context, int) {
+            itemBuilder: (context, index) {
               return const Icon(
                 Icons.star,
                 color: Colors.blue,
@@ -890,6 +891,7 @@ class TitleSectionView extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.symmetric(horizontal: MARGIN_MEDIUM_2x),
       child: ImageAndTitleSectionView(
+        key: const Key(KEY_DETAILS_PAGE_TITLE_AND_AUTHOR_SECTION),
         imageUrl: imageUrl,
         title: title,
         author: author,
@@ -952,6 +954,7 @@ class CustomAppBarForBookDetails extends StatelessWidget
           Icons.chevron_left,
           color: Colors.grey,
           size: MARGIN_LARGE,
+          key: Key(KEY_BOOK_DETAILS_PAGE_BACK_BUTOON),
         ),
       ),
       actions: const [

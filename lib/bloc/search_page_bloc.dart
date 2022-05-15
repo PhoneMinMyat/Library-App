@@ -64,7 +64,6 @@ class SearchPageBloc extends ChangeNotifier {
         .map((category) =>
             BookListVO(listName: category, booksList: groups[category]))
         .toList();
-    print(resultSearchBookByCategory.toString());
     safeNotifyListeners();
   }
 
