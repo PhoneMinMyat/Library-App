@@ -11,9 +11,12 @@ class YourShelvesViewBloc extends ChangeNotifier {
 
   List<ShelfVO>? shelveList;
 
-  final NyTimesModel _model = NyTimesModelImpl();
+   NyTimesModel _model = NyTimesModelImpl();
 
-  YourShelvesViewBloc() {
+  YourShelvesViewBloc([NyTimesModel? nyTimesModel]) {
+    if(nyTimesModel!=null){
+      _model = nyTimesModel;
+    }
     _model.getShelfListFromDatabase().listen((shelfListFromDB) {
       shelveList = shelfListFromDB;
       safeNotifyListeners();

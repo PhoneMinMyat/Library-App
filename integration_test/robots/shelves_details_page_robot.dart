@@ -52,5 +52,11 @@ class ShelvesDetailsPageRobot {
 
     await tester.tap(find.byKey(const Key(KEY_SHELF_DETAILS_DELETE)));
     await tester.pumpAndSettle(const Duration(seconds: 2));
+
+    expect(find.byKey(const Key(KEY__SHELF_DELETE_ALERT_DIALOG)), findsOneWidget);
+    expect(find.byKey(const Key(KEY__SHELF_DELETE_ALERT_DIALOG_CONFIRM)), findsOneWidget);
+
+    await tester.tap(find.byKey(const Key(KEY__SHELF_DELETE_ALERT_DIALOG_CONFIRM)));
+    await tester.pumpAndSettle(const Duration(seconds: 2));
   }
 }

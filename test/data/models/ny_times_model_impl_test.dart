@@ -72,9 +72,14 @@ void main() {
           emits(getMockBookList()));
     });
 
-    test('Filter Book List By Category', () {
+    test('Filter Book List By Empty Category', () {
       expect(
           nyTimesModel.filterBookListByCategory([]), emits(getMockBookList()));
+    });
+
+    test('Filter Book List By Category ', () {
+      expect(nyTimesModel.filterBookListByCategory(['Category One']),
+          emits([getMockBookList()?.first]));
     });
 
     test('Get Shelf List From Database', () {

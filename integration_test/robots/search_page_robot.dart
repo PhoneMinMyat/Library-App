@@ -36,9 +36,7 @@ class SearchPageRobot {
   }
 
   Future<void> tapSearchButtonAndCheck() async {
-    expect(find.byKey(const Key(KEY_SEARCH_ICON_BUTTON)), findsOneWidget);
-
-    await tester.tap(find.byKey(const Key(KEY_SEARCH_ICON_BUTTON)));
+    await tester.testTextInput.receiveAction(TextInputAction.done);
 
     await tester.pumpAndSettle(const Duration(seconds: 5));
 

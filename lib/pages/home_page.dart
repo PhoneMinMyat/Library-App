@@ -46,7 +46,7 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-        backgroundColor: Colors.white.withOpacity(0.96),
+        backgroundColor: Colors.white,
         body: Stack(
           children: [
             PageView(
@@ -102,13 +102,12 @@ class CustomAppBarWithSearchBar extends StatelessWidget {
     return Container(
       width: double.infinity,
       height: APPBAR_HEIGHT,
-      color: Colors.white.withOpacity(0.99),
+      color: Colors.white,
       child: Container(
         margin: const EdgeInsets.symmetric(
             horizontal: MARGIN_MEDIUM_2x, vertical: MARGIN_CARD_MEDIUM_2),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(SEARCH_BAR_BORDER_RADIUS),
-        
         ),
         child: Card(
           elevation: 3,
@@ -117,7 +116,10 @@ class CustomAppBarWithSearchBar extends StatelessWidget {
             padding: const EdgeInsets.all(MARGIN_MEDIUM),
             child: Row(
               children: [
-                const Icon(Icons.search),
+                const Icon(
+                  Icons.search,
+                  color: Colors.black54,
+                ),
                 const SizedBox(
                   width: MARGIN_MEDIUM_2x,
                 ),
@@ -136,9 +138,16 @@ class CustomAppBarWithSearchBar extends StatelessWidget {
                 const SizedBox(
                   width: MARGIN_MEDIUM_2x,
                 ),
-                const CircleAvatar(
-                  child: Icon(Icons.person),
-                  backgroundColor: Colors.blueAccent,
+                Container(
+                  width: MARGIN_XLARGE,
+                  decoration: const BoxDecoration(shape: BoxShape.circle),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(MARGIN_MEDIUM_2x),
+                    child: Image.network(
+                      'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxjb2xsZWN0aW9uLXRodW1ibmFpbHx8OU02OGhrQzYzSDR8fGVufDB8fHx8&auto=format&fit=crop&w=420&q=60',
+                      fit: BoxFit.cover,
+                    ),
+                  ),
                 )
               ],
             ),

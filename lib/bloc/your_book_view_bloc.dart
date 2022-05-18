@@ -16,9 +16,13 @@ class YourBookViewBloc extends ChangeNotifier {
   List<CategoryChipVO>? categoryChipList;
   Set<String> tempCategoryChipList = {};
 
-  final NyTimesModel _nyTimesModel = NyTimesModelImpl();
+   NyTimesModel _nyTimesModel = NyTimesModelImpl();
 
-  YourBookViewBloc() {
+  YourBookViewBloc([NyTimesModel? nyTimesModel]) {
+    if(nyTimesModel != null){
+      _nyTimesModel = nyTimesModel;
+    }
+
     _nyTimesModel.getViewedBookListFromDatabase().listen((bookList) {
       List<BookVO> tempBookList = bookList;
       tempBookList.sort(

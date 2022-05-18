@@ -76,7 +76,7 @@ class GoogleBookModelImpl extends GoogleBookModel {
           ?.identifier;
       tempBookList.add(tempBookVO);
     });
-   
+
     return tempBookList;
   }
 }

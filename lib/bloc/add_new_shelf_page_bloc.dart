@@ -7,9 +7,13 @@ class AddNewShelfPageBloc extends ChangeNotifier {
   BookVO? selectedBook;
   bool isDispose = false;
 
-  final NyTimesModel _model = NyTimesModelImpl();
+   NyTimesModel _model = NyTimesModelImpl();
 
-  AddNewShelfPageBloc(String bookId) {
+  AddNewShelfPageBloc(String bookId,[NyTimesModel? nyTimesModel]) {
+    if(nyTimesModel != null){
+      _model = nyTimesModel;
+    }
+
     if (bookId.isNotEmpty) {
       _model.getSingleBookFromDatabase(bookId).listen((book) {
         selectedBook = book;

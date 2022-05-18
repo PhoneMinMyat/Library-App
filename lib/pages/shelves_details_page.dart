@@ -55,11 +55,11 @@ class _ShelvesDetailsPageState extends State<ShelvesDetailsPage> {
   }
 
   void onTapDeleteShelf() async {
-    print('Tap Delete');
-    await Future.delayed(Duration(milliseconds: 500));
+    await Future.delayed(const Duration(milliseconds: 500));
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
+        key: const Key(KEY__SHELF_DELETE_ALERT_DIALOG),
         title: const Text(DELETE_SHELF),
         content: const Text(DELETE_SHELF_CONTENT),
         actions: [
@@ -75,7 +75,10 @@ class _ShelvesDetailsPageState extends State<ShelvesDetailsPage> {
               Navigator.pop(context);
               Navigator.pop(context);
             },
-            child: const Text(CONFIRM),
+            child: const Text(
+              CONFIRM,
+              key: Key(KEY__SHELF_DELETE_ALERT_DIALOG_CONFIRM),
+            ),
           ),
         ],
         actionsPadding: const EdgeInsets.all(MARGIN_MEDIUM_2x),
@@ -134,7 +137,7 @@ class _ShelvesDetailsPageState extends State<ShelvesDetailsPage> {
         builder: (context, bloc, child) {
           String tempText = '';
           return Scaffold(
-            backgroundColor: Colors.white.withOpacity(0.96),
+            backgroundColor: Colors.white,
             appBar: CustomAppBarForShelves(
               onTapRename: () {
                 ShelvesDetailsPageBloc bloc =
@@ -298,7 +301,7 @@ class CustomAppBarForShelves extends StatelessWidget
   @override
   Widget build(BuildContext context) {
     return AppBar(
-      backgroundColor: Colors.white.withOpacity(0.80),
+      backgroundColor: Colors.white,
       elevation: 0,
       automaticallyImplyLeading: false,
       leading: GestureDetector(

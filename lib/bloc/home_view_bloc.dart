@@ -12,9 +12,13 @@ class HomeViewBloc extends ChangeNotifier {
   List<BookListVO>? bookCollectionList;
   List<BookVO>? recentViewedBookList;
 
-  final NyTimesModel _model = NyTimesModelImpl();
+  NyTimesModel _model = NyTimesModelImpl();
 
-  HomeViewBloc() {
+  HomeViewBloc([NyTimesModel? nyTimesModel]) {
+    if (nyTimesModel != null) {
+      _model = nyTimesModel;
+    }
+
     _model.getOverviewBookListFromDatabase().listen((bookList) {
       bookCollectionList = bookList;
       safeNotifyListeners();
@@ -22,18 +26,16 @@ class HomeViewBloc extends ChangeNotifier {
 
     _model.getViewedBookListFromDatabase().listen((bookList) {
       List<BookVO> tempBookList = bookList;
-      tempBookList.sort((a,b)=> a.userViewedTime?.compareTo(b.userViewedTime ?? '') ?? 0);
+      tempBookList.sort(
+          (a, b) => a.userViewedTime?.compareTo(b.userViewedTime ?? '') ?? 0);
       recentViewedBookList = tempBookList.reversed.toList();
       safeNotifyListeners();
     }).onError((error) => print(error));
   }
 
   void onTapHomeTabBar(int selectedIndex) {
-   
-      if (selectedIndex == 0) {
-      } else {
-      }
-   
+    if (selectedIndex == 0) {
+    } else {}
   }
 
   void safeNotifyListeners() {

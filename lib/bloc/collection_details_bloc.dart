@@ -4,7 +4,7 @@ import 'package:library_app/data/models/ny_times_model_impl.dart';
 import 'package:library_app/data/vos/book_vo.dart';
 
 class CollectionDetailsBloc extends ChangeNotifier {
-  final NyTimesModel _model = NyTimesModelImpl();
+   NyTimesModel _model = NyTimesModelImpl();
   bool isDispose = false;
   int bookOffset = 0;
   String listName = '';
@@ -12,13 +12,16 @@ class CollectionDetailsBloc extends ChangeNotifier {
   //State Variables
   List<BookVO>? bookList;
 
-  CollectionDetailsBloc(String list) {
+  CollectionDetailsBloc(String list, [NyTimesModel? nyTimesModel]) {
+    if(nyTimesModel != null){
+      _model = nyTimesModel;
+    }
+
     listName = list;
     getBookList(list, bookOffset);
   }
 
   void getBookList(String list, int offset) {
-    print('call get Book List');
     List<BookVO> tempBookList = [];
     _model
         .getBookCategoryListDetails(list, (offset * 20).toString())

@@ -5,14 +5,17 @@ import 'package:library_app/data/vos/book_list_vo.dart';
 import 'package:library_app/data/vos/book_vo.dart';
 
 class BookDetailsBloc extends ChangeNotifier {
-  final NyTimesModel _model = NyTimesModelImpl();
+   NyTimesModel _model = NyTimesModelImpl();
   bool isDispose = false;
 
   //State Variables
   BookVO? book;
   BookListVO? similarBooks;
 
-  BookDetailsBloc(String bookId) {
+  BookDetailsBloc(String bookId,[NyTimesModel? nyTimesModel]) {
+     if(nyTimesModel != null){
+      _model = nyTimesModel;
+    }
     _model.getSingleBookFromDatabase(bookId).listen((bookFromDatabase) {
       book = bookFromDatabase;
 

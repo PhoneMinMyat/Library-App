@@ -35,7 +35,7 @@ class CarouselBookItem extends StatelessWidget {
                       )
                     : Image.network(
                         book.bookImage ?? '',
-                        fit: BoxFit.cover,
+                        fit: BoxFit.fill,
                       ),
               ),
             ),

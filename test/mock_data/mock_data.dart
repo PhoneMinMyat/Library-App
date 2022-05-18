@@ -9,19 +9,67 @@ import 'package:library_app/data/vos/shelf_vo.dart';
 List<BookVO>? getMockBookList() {
   return [
     BookVO(
-      primaryIsbn10: '1',
-      title: 'Book One',
-      author: 'Author One',
-    ),
+        primaryIsbn10: '1',
+        title: 'Book One',
+        author: 'Author One',
+        category: 'Category One',
+        userViewedTime: '1'),
     BookVO(
-      primaryIsbn10: '2',
-      title: 'Book Two',
-      author: 'Author Two',
-    ),
+        primaryIsbn10: '2',
+        title: 'Book Two',
+        author: 'Author Two',
+        category: 'Category Two',userViewedTime: '2'),
     BookVO(
-      primaryIsbn10: '3',
-      title: 'Book Three',
-      author: 'Author Three',
+        primaryIsbn10: '3',
+        title: 'Book Three',
+        author: 'Author Three',
+        category: 'Category Three',userViewedTime: '3'),
+  ];
+}
+
+List<BookListVO>? getMockBookCollectionWithCategory() {
+  return [
+     BookListVO(
+      listId: 1,
+      listName: 'Category One',
+      booksList: [
+        BookVO(
+          primaryIsbn10: '1',
+          title: 'Book One',
+          author: 'Author One',
+        ),
+        BookVO(
+          primaryIsbn10: '2',
+          title: 'Book Two',
+          author: 'Author Two',
+        ),
+        BookVO(
+          primaryIsbn10: '3',
+          title: 'Book Three',
+          author: 'Author Three',
+        ),
+      ],
+    ),
+    BookListVO(
+      listId: 2,
+      listName: 'Category One',
+      booksList: [
+        BookVO(
+          primaryIsbn10: '4',
+          title: 'Book Four',
+          author: 'Author Four',
+        ),
+        BookVO(
+          primaryIsbn10: '5',
+          title: 'Book Five',
+          author: 'Author Five',
+        ),
+        BookVO(
+          primaryIsbn10: '6',
+          title: 'Book Six',
+          author: 'Author Six',
+        ),
+      ],
     ),
   ];
 }

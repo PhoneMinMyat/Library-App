@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:library_app/widget_keys.dart';
@@ -52,6 +54,15 @@ class _BookDetailsPageState extends State<BookDetailsPage> {
         builder: (context) => BookCollectionDetailsPage(titleName: title)));
   }
 
+  double getRandomPrice(){
+    int integarValue = Random().nextInt(10)  +5;
+
+    double doubleValue = Random().nextDouble();
+
+    double returnValue = double.parse((integarValue + doubleValue).toStringAsFixed(2));
+    return returnValue;
+  }
+
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
@@ -76,9 +87,9 @@ class _BookDetailsPageState extends State<BookDetailsPage> {
                 const SizedBox(
                   height: MARGIN_MEDIUM_2x,
                 ),
-                const Padding(
-                  padding: EdgeInsets.symmetric(horizontal: MARGIN_MEDIUM_2x),
-                  child: BuyingSection(),
+                 Padding(
+                  padding:const EdgeInsets.symmetric(horizontal: MARGIN_MEDIUM_2x),
+                  child: BuyingSection(price: getRandomPrice()),
                 ),
                 const SizedBox(
                   height: MARGIN_MEDIUM_2x,
@@ -94,13 +105,13 @@ class _BookDetailsPageState extends State<BookDetailsPage> {
                 const SizedBox(
                   height: MARGIN_MEDIUM_2x,
                 ),
-                const Padding(
-                  padding: EdgeInsets.symmetric(horizontal: MARGIN_MEDIUM_2x),
-                  child: RatingAndReviewSectionView(),
-                ),
-                const SizedBox(
-                  height: MARGIN_MEDIUM_2x,
-                ),
+                // const Padding(
+                //   padding: EdgeInsets.symmetric(horizontal: MARGIN_MEDIUM_2x),
+                //   child: RatingAndReviewSectionView(),
+                // ),
+                // const SizedBox(
+                //   height: MARGIN_MEDIUM_2x,
+                // ),
                 Padding(
                   padding:
                       const EdgeInsets.symmetric(horizontal: MARGIN_MEDIUM_2x),
@@ -640,7 +651,8 @@ class AboutView extends StatelessWidget {
 }
 
 class BuyingSection extends StatelessWidget {
-  const BuyingSection({
+  final double price;
+  const BuyingSection({required this.price,
     Key? key,
   }) : super(key: key);
 
@@ -649,14 +661,14 @@ class BuyingSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        const ButtonViewSection(),
+         ButtonViewSection(price: price.toString(),),
         const SizedBox(
           height: MARGIN_MEDIUM,
         ),
-        const Text(
-          'Was \$17.71',
+         Text(
+          'Was \$${price + 2}',
           textAlign: TextAlign.end,
-          style: TextStyle(fontSize: TEXT_SMALL_2x, color: Colors.black54),
+          style:const TextStyle(fontSize: TEXT_SMALL_2x, color: Colors.black54),
         ),
         const SizedBox(
           height: MARGIN_MEDIUM_2x,
@@ -694,7 +706,8 @@ class BuyingSection extends StatelessWidget {
 }
 
 class ButtonViewSection extends StatelessWidget {
-  const ButtonViewSection({
+  final String price;
+  const ButtonViewSection({required this.price,
     Key? key,
   }) : super(key: key);
 
@@ -702,18 +715,18 @@ class ButtonViewSection extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceAround,
-      children: const [
-        Expanded(
+      children:  [
+       const Expanded(
           child: CustomBuyButton(
             text: FREE_SAMPLE,
           ),
         ),
-        SizedBox(
+      const  SizedBox(
           width: MARGIN_MEDIUM,
         ),
         Expanded(
           child: CustomBuyButton(
-            text: BUY,
+            text: 'Buy \$$price',
             isBlueButton: true,
           ),
         ),

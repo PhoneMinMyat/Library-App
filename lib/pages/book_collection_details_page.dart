@@ -52,7 +52,7 @@ class _BookCollectionDetailsPageState extends State<BookCollectionDetailsPage> {
     return ChangeNotifierProvider(
       create: (context) => _bloc,
       builder: (context, child) => Scaffold(
-        backgroundColor: Colors.white.withOpacity(0.96),
+        backgroundColor: Colors.white,
         appBar: CustomAppBarForCollectionDetails(titleName: widget.titleName),
         body: Selector<CollectionDetailsBloc, List<BookVO>?>(
           selector: (context, bloc) => bloc.bookList,
@@ -101,7 +101,7 @@ class CustomAppBarForCollectionDetails extends StatelessWidget
   @override
   Widget build(BuildContext context) {
     return AppBar(
-      backgroundColor: Colors.white.withOpacity(0.96),
+      backgroundColor: Colors.white,
       automaticallyImplyLeading: false,
       elevation: 0,
       shape:

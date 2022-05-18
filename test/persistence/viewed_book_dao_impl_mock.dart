@@ -13,7 +13,11 @@ class ViewedBookDaoImplMock extends ViewedBookDao {
 
   @override
   List<BookVO> filterBookByCategory(List<String> categoryList) {
-    return getMockBookList() ?? [];
+    if (categoryList.isEmpty) {
+      return getMockBookList() ?? [];
+    }else{
+      return [getMockBookList()?.first ?? BookVO()];
+    }
   }
 
   @override

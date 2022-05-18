@@ -18,9 +18,13 @@ class SearchPageBloc extends ChangeNotifier {
 
   String searchWordText = '';
 
-  final GoogleBookModel _mModel = GoogleBookModelImpl();
+   GoogleBookModel _mModel = GoogleBookModelImpl();
 
-  SearchPageBloc() {
+  SearchPageBloc([GoogleBookModel? googleBookModel]) {
+    if(googleBookModel != null){
+      _mModel = googleBookModel;
+    }
+
     isFocus = true;
     isSearching = false;
     isSearched = false;

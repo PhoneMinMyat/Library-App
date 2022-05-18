@@ -12,9 +12,12 @@ class AddBookToShelfPageBloc extends ChangeNotifier {
   List<ShelfVO>? shelveList;
   String? tempBookId;
 
-  final NyTimesModel _model = NyTimesModelImpl();
+   NyTimesModel _model = NyTimesModelImpl();
 
-  AddBookToShelfPageBloc(String bookId) {
+  AddBookToShelfPageBloc(String bookId,[NyTimesModel? nyTimesModel]) {
+    if(nyTimesModel != null){
+      _model = nyTimesModel;
+    }
     tempBookId = bookId;
 
     _model.getShelfListFromDatabase().listen((shelfListFromDB) {

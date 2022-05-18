@@ -97,7 +97,7 @@ class _SearchPageState extends State<SearchPage> {
       create: (context) => _bloc,
       builder: (context, child) => Consumer<SearchPageBloc>(
         builder: (context, searchBloc, child) => Scaffold(
-          backgroundColor: Colors.white.withOpacity(0.96),
+          backgroundColor: Colors.white,
           appBar: CustomAppBarForSearchPage(
             onTapSearchBar: () {
               SearchPageBloc bloc =
@@ -280,7 +280,6 @@ class CustomAppBarForSearchPage extends StatelessWidget
 
   @override
   Widget build(BuildContext context) {
-    String tempText = '';
     return AppBar(
       backgroundColor: Colors.white,
       elevation: 0,
@@ -305,7 +304,7 @@ class CustomAppBarForSearchPage extends StatelessWidget
         },
         autofocus: isFocus,
         onChanged: (value) {
-          tempText = value;
+          
           onChangeTextInput(value);
         },
         onTap: () {
@@ -314,21 +313,6 @@ class CustomAppBarForSearchPage extends StatelessWidget
         decoration: const InputDecoration(
             hintText: SEARCH_PLAY_BOOKS, border: InputBorder.none),
       ),
-      actions: [
-        GestureDetector(
-          onTap: () {
-            onSubmmit(tempText);
-          },
-          child: const Icon(
-            Icons.search,
-            color: Colors.black54,
-            key: Key(KEY_SEARCH_ICON_BUTTON),
-          ),
-        ),
-        const SizedBox(
-          width: MARGIN_MEDIUM_2x,
-        )
-      ],
     );
   }
 

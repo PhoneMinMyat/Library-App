@@ -21,9 +21,12 @@ class ShelvesDetailsPageBloc extends ChangeNotifier {
   String? shelfTitle;
   bool isEditing = false;
 
-  final NyTimesModel _nyTimesModel = NyTimesModelImpl();
+   NyTimesModel _nyTimesModel = NyTimesModelImpl();
 
-  ShelvesDetailsPageBloc(int shelvesId) {
+  ShelvesDetailsPageBloc(int shelvesId, [NyTimesModel? nyTimesModel]) {
+    if(nyTimesModel != null){
+      _nyTimesModel = nyTimesModel;
+    }
     tempShelfId = shelvesId;
     _nyTimesModel.getShelfById(shelvesId).listen((shelf) {
       bookListFromShelf = shelf?.bookList ?? [];
